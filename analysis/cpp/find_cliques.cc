@@ -1,3 +1,17 @@
+// Copyright 2014 Google Inc. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #include <assert.h>
 #include <stdarg.h>  // va_list, etc.
 #include <stdio.h>
@@ -60,17 +74,17 @@ struct Node {
 
 // Implement hash and equality functors for unordered_set.
 struct NodeHash {
-  long operator() (const Node& node) const {
+  int operator() (const Node& node) const {
     // DJB hash: http://floodyberry.com/noncryptohashzoo/DJB.html
-    long h = 5381;
+    int h = 5381;
     h = (h << 5) + h + node.partition;
     h = (h << 5) + h + node.ngram[0];
     h = (h << 5) + h + node.ngram[1];
-    //log("hash %s = %d", node.ToString().c_str(), h);
+    // log("hash %s = %d", node.ToString().c_str(), h);
     return h;
   }
 };
- 
+
 struct NodeEq {
   bool operator() (const Node& x, const Node& y) const {
     // TODO: optimize to 4 byte comparison with memcmp(&x, &y, sizeof(Node))?
@@ -104,15 +118,15 @@ struct Edge {
 
 // Implement hash and equality functors for unordered_set.
 struct EdgeHash {
-  long operator() (const Edge& edge) const {
+  int operator() (const Edge& edge) const {
     // DJB hash
-    long h = 5381;
+    int h = 5381;
     h = (h << 5) + h + NodeHash()(edge.left);
     h = (h << 5) + h + NodeHash()(edge.right);
     return h;
   }
 };
- 
+
 struct EdgeEq {
   bool operator() (const Edge& x, const Edge& y) const {
     // TODO: optimize to 8 byte comparison with memcmp(&x, &y, sizeof(Edge))?
@@ -161,7 +175,7 @@ string AdjacencyToString(const Adjacency& a) {
 
 class ColumnSubgraph {
  public:
-   ColumnSubgraph(int num_columns)
+  explicit ColumnSubgraph(int num_columns)
       : num_columns_(num_columns),
         adj_list_(new Adjacency[num_columns]) {
   }
@@ -190,7 +204,7 @@ class ColumnSubgraph {
     int part = n.partition;
     const Adjacency& a = adj_list_[part];
 
-    //log("GetAdjacentNodes %s, part %d", n.ToString().c_str(), part);
+    // log("GetAdjacentNodes %s, part %d", n.ToString().c_str(), part);
 
     auto it = a.find(n);
     if (it == a.end()) {
@@ -239,50 +253,50 @@ void BuildColumnSubgraph(const Graph& g, ColumnSubgraph* a) {
 // We use a single vector<> to represent it, to reduce memory allocation.
 class PathArray {
  public:
-   PathArray(int path_length)
-      : path_length_(path_length),
-        num_paths_(0) {
-   }
-   void AddEdgeAsPath(Edge e) {
-     // Can only initialize PathArray with edges when path length is 2
-     assert(path_length_ == 2);
+  explicit PathArray(int path_length)
+     : path_length_(path_length),
+       num_paths_(0) {
+  }
+  void AddEdgeAsPath(Edge e) {
+    // Can only initialize PathArray with edges when path length is 2
+    assert(path_length_ == 2);
 
-     nodes_.push_back(e.left);
-     nodes_.push_back(e.right);
-     num_paths_++;
-   }
-   Node LastNodeInPath(int index) const {
-     int start = index * path_length_;
-     return nodes_[start + path_length_ -1];
-   }
-   // Pretty print a single path in this array.  For debugging only.
-   string PathToString(int index) const {
-     string s("[ ");
-     for (int i = index * path_length_; i < (index + 1) * path_length_; ++i) {
-       s += nodes_[i].ToString();
-       s += " - ";
-     }
-     s += " ]";
-     return s;
-   }
-   const Node* GetPathStart(int index) const {
-     return &nodes_[index * path_length_];
-   }
-   void AddPath(const Node* start, int prefix_length, Node right) {
-     // Make sure it is one less
-     assert(prefix_length == path_length_-1);
+    nodes_.push_back(e.left);
+    nodes_.push_back(e.right);
+    num_paths_++;
+  }
+  Node LastNodeInPath(int index) const {
+    int start = index * path_length_;
+    return nodes_[start + path_length_ -1];
+  }
+  // Pretty print a single path in this array.  For debugging only.
+  string PathToString(int index) const {
+    string s("[ ");
+    for (int i = index * path_length_; i < (index + 1) * path_length_; ++i) {
+      s += nodes_[i].ToString();
+      s += " - ";
+    }
+    s += " ]";
+    return s;
+  }
+  const Node* GetPathStart(int index) const {
+    return &nodes_[index * path_length_];
+  }
+  void AddPath(const Node* start, int prefix_length, Node right) {
+    // Make sure it is one less
+    assert(prefix_length == path_length_-1);
 
-     // TODO: replace with memcpy?  Is it faster?
-     for (int i = 0; i < prefix_length; ++i) {
-       nodes_.push_back(start[i]);
-     }
-     nodes_.push_back(right);
-     num_paths_++;
-   }
+    // TODO: replace with memcpy?  Is it faster?
+    for (int i = 0; i < prefix_length; ++i) {
+      nodes_.push_back(start[i]);
+    }
+    nodes_.push_back(right);
+    num_paths_++;
+  }
 
-   // accessors
-   int num_paths() const { return num_paths_; }
-   int path_length() const { return path_length_; }
+  // accessors
+  int num_paths() const { return num_paths_; }
+  int path_length() const { return path_length_; }
 
  private:
   int path_length_;
@@ -297,7 +311,7 @@ void EnumerateStep(
   int prefix_length = in.path_length();
 
   for (int i = 0; i < in.num_paths(); ++i) {
-    //log("col %d, path %d", col, i);
+    // log("col %d, path %d", col, i);
 
     // last node in every path
     Node last_node = in.LastNodeInPath(i);
@@ -363,7 +377,7 @@ void EnumeratePaths(
 bool IsClique(const Node* path, int k, const EdgeSet& edge_set) {
   // We need to ensure that (k choose 2) edges are all in edge_set.
   // We already know that k-1 of them are present, so we need to check (k
-  // choose 2) - (k-1).  
+  // choose 2) - (k-1).
   for (int i = 0; i < k; ++i) {
     for (int j = i + 1; j < k; ++j) {
       if (i + 1 == j) {
@@ -424,7 +438,7 @@ bool ParseGraph(Graph* g, EdgeSet* edge_set) {
       log("ERROR: Expected 6 values for edge, got %d", ret);
       return false;
     }
-    //log("%d -> %d", part1, part2);
+    // log("%d -> %d", part1, part2);
     if (part1 >= part2) {
       log("ERROR: edge in wrong order (%d >= %d)", part1, part2);
       return false;
@@ -472,7 +486,7 @@ int main() {
   BuildColumnSubgraph(g, &subgraph);
   log("%s", subgraph.ToString().c_str());
 
-  //PathArray candidates(num_partitions);
+  // PathArray candidates(num_partitions);
   log("EnumeratePaths");
   PathArray candidates(g.num_partitions);
   EnumeratePaths(subgraph, &candidates);
@@ -491,6 +505,7 @@ int main() {
     log("Path %d is incomplete", p);
   }
 
+  log("Found cliques:");
   // Now print all the complete ones to stdout
   for (int i = 0; i < candidates.num_paths(); i++) {
     if (incomplete.find(i) == incomplete.end()) {

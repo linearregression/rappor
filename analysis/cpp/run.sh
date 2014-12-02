@@ -27,4 +27,15 @@ demo() {
   time cat $graph | ./find_cliques
 }
 
+get-lint() {
+  mkdir -p _tmp
+  wget --directory _tmp \
+    http://google-styleguide.googlecode.com/svn/trunk/cpplint/cpplint.py
+  chmod +x _tmp/cpplint.py
+}
+
+lint() {
+  _tmp/cpplint.py find_cliques.cc
+}
+
 "$@"

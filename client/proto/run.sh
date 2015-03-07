@@ -20,11 +20,13 @@ build() {
 compile-test() {
   # for unordered_{map,set}
   # -std=c++0x \
+
+  # NOTE: -lprotobuf comes after source files
   g++ \
     -I_tmp \
-    -lprotobuf \
     -o rappor_test \
-    _tmp/rappor.pb.cc rappor_test.cc
+    _tmp/rappor.pb.cc rappor_test.cc \
+    -lprotobuf 
 }
 
 rappor-test() {

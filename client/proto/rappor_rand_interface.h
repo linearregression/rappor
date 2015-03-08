@@ -25,6 +25,9 @@ class RandInterface {
  public:
   // NOTE: unsigned int for now.  Caller has to make sure it bits match
   // the internal bloom filter size?
+  // 
+  // TODO: How about define the ByteVector type here?
+
   virtual unsigned int f_bits() const = 0;
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;

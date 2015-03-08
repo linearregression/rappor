@@ -45,13 +45,28 @@ int main() {
 
   rappor::log("hi %s", reports.report(0).c_str());
 
-  rappor::Encoder encoder("home-page", 1, p, libc_rand);
+  int cohort = 9;
+  const char* metric_name = "home-page";
+  rappor::Encoder encoder(metric_name, cohort, p, libc_rand);
 
   // what should this return?
   // single report.
   // Then aggregate them all into a report, with params.
-  std::string out;
-  encoder.Encode("foo", &out);
+  //
+  // TODO: loop over stdin
 
-  rappor::log("Output: %x", out.c_str());
+  for (int i = 0; i < 5; ++i) {
+    std::string out;
+    encoder.Encode("foo", &out);
+    rappor::log("Output: %x", out.c_str());
+    reports.add_report(out);
+  }
+
+  rappor::ReportListHeader* header = reports.mutable_header();
+  // client params?
+  header->set_metric_name(metric_name);
+  header->set_cohort(cohort);
+  header->mutable_params()->CopyFrom(p);
+
+  rappor::log("report list %s", reports.DebugString().c_str());
 }

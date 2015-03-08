@@ -53,10 +53,8 @@ typedef uint64_t ByteVector;
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
   ByteVector bloom;
-  //std::string bytes;
-  //bytes.reserve(num_bytes_);
 
-  // First do hashing
+  // First do hashing.
 
   for (int i = 0; i < params_.num_hashes(); ++i) {
     // TODO: need more than one hash function
@@ -70,7 +68,7 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
     bloom |= 1 << bit_to_set;
   }
 
-  // Now do PRR.
+  // Do PRR.
 
   ByteVector f_bits = rand_.f_bits();
   log("f_bits: %x", f_bits);
@@ -81,7 +79,8 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   ByteVector prr = (f_bits & uniform) | (bloom & ~uniform);
   log("prr: %x", uniform);
 
-  // Now do IRR
+  // Do IRR.
+
   ByteVector p_bits = rand_.p_bits();
   ByteVector q_bits = rand_.q_bits();
 
@@ -92,7 +91,8 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
 
   log("irr: %x", irr);
 
-  // Copy it into a string, which can go in a protobuf.
+  // Copy IRR into a string, which can go in a protobuf.
+
   output->reserve(num_bytes_);
   for (int i = 0; i < num_bytes_; ++i) {
     //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte

@@ -30,4 +30,8 @@ int main() {
   rappor::RapporReports r;
   r.set_cohort(10);
   log("hi %d", r.cohort());
+
+  rappor::Params p;
+  p.set_num_cohorts(128);
+  log("params %s", p.DebugString().c_str());
 }

@@ -12,26 +12,9 @@ setup() {
   sudo apt-get install protobuf-compiler libprotobuf-dev
 }
 
-build() {
-  mkdir -p _tmp
-  protoc --cpp_out _tmp rappor.proto
-}
-
-compile-test() {
-  # for unordered_{map,set}
-  # -std=c++0x \
-
-  # NOTE: -lprotobuf comes after source files
-  g++ \
-    -I_tmp \
-    -o rappor_test \
-    _tmp/rappor.pb.cc rappor_test.cc \
-    -lprotobuf 
-}
-
 rappor-test() {
-  compile-test
-  ./rappor_test
+  make _tmp/rappor_test
+  _tmp/rappor_test
 }
 
 "$@"

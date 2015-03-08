@@ -47,28 +47,27 @@ bool Encoder::IsValid() const {
   return is_valid_;
 }
 
-typedef std::vector<uint8_t> ByteVector;
+//typedef std::vector<uint8_t> ByteVector;
+// We don't need more than 8 bytes for now
+typedef uint64_t ByteVector; 
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
-  // Do we need this?
-  //ByteVector bytes(num_bytes_);
-  std::string bytes;
-  bytes.reserve(num_bytes_);
+  ByteVector bytes;
+  //std::string bytes;
+  //bytes.reserve(num_bytes_);
 
   // First do hashing
 
   for (int i = 0; i < params_.num_hashes(); ++i) {
+    // TODO: need more than one hash function
     int h = 5381;
     for (int j = 0; j < value.size(); ++j) {
       h = (h << 5) + h + value[j];
     }
+    unsigned int bit_to_set = h % params_.num_bits();
+    log("Hash %d: %d, set bit %d", i, h, bit_to_set);
 
-    unsigned int hash_value = h % params_.num_bits();
-    log("Hash %d: %d", i, hash_value);
-
-    int byte_index = hash_value / 8;
-    int bit_index = hash_value % 8;
-    bytes[byte_index] |= 1 << bit_index;
+    bytes |= 1 << bit_to_set;
   }
 
   // Now do PRR.
@@ -83,7 +82,11 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   // Copy it into a string, which can go in a protobuf.
   output->reserve(num_bytes_);
   for (int i = 0; i < num_bytes_; ++i) {
-    output[i] = bytes[i];
+    //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte
+
+    // "little endian" string
+    output[i] = bytes & 0xFF;  // last byte
+    bytes >>= 8;
   }
 }
 

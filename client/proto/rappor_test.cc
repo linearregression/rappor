@@ -53,5 +53,5 @@ int main() {
   std::string out;
   encoder.Encode("foo", &out);
 
-  rappor::log("Output: %s", out.c_str());
+  rappor::log("Output: %x", out.c_str());
 }

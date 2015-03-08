@@ -17,6 +17,7 @@
 
 #include "rappor.pb.h"
 #include "rappor.h"
+#include "libc_rand.h"
 
 void log(const char* fmt, ...) {
   va_list args;
@@ -39,6 +40,8 @@ void log(const char* fmt, ...) {
 int main() {
   rappor::ReportList reports;
   reports.add_report("dummy");
+
+  rappor::LibcRand libc_rand(0.50, 0.50, 0.75);
 
   log("hi %s", reports.report(0).c_str());
 

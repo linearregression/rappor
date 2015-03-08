@@ -30,29 +30,19 @@
 
 int main() {
   rappor::ReportList reports;
-  reports.add_report("dummy");
 
   rappor::Params p;
   p.set_num_cohorts(128);
   p.set_num_bits(8);
   p.set_num_hashes(2);
-  rappor::log("params %s", p.DebugString().c_str());
 
   rappor::LibcRandGlobalInit();  // seed
   rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.50, 0.75);
-
-  rappor::log("p_bits: %x", libc_rand.p_bits());
-
-  rappor::log("hi %s", reports.report(0).c_str());
 
   int cohort = 9;
   const char* metric_name = "home-page";
   rappor::Encoder encoder(metric_name, cohort, p, libc_rand);
 
-  // what should this return?
-  // single report.
-  // Then aggregate them all into a report, with params.
-  //
   // TODO: loop over stdin
 
   for (int i = 0; i < 5; ++i) {

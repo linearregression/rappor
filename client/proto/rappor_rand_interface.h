@@ -21,13 +21,13 @@ namespace rappor {
 
 // Interface that the encoder requires.  Applications should implement this
 // according to their own requirements.
-class RapporRandInterface {
+class RandInterface {
  public:
   // NOTE: unsigned int for now.  Caller has to make sure it bits match
   // the internal bloom filter size?
-  virtual unsigned int f_bits() = 0;
-  virtual unsigned int p_bits() = 0;
-  virtual unsigned int q_bits() = 0;
+  virtual unsigned int f_bits() const = 0;
+  virtual unsigned int p_bits() const = 0;
+  virtual unsigned int q_bits() const = 0;
 };
 
 }  // namespace rappor

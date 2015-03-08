@@ -18,6 +18,7 @@
 #include <string>
 
 #include "rappor.pb.h"
+#include "rappor_rand_interface.h"
 
 namespace rappor {
 
@@ -29,15 +30,19 @@ class Encoder {
 
   Encoder(
       const std::string& metric_name, int cohort,
-      const rappor::Params& params);
+      const Params& params, const RandInterface& rand);
 
   // something like StringPiece would be better here
   // or const char*?
   bool Encode(const std::string& value);
 
  private:
-  const rappor::Params& params_;
+  const Params& params_;
+  const RandInterface& rand_;
 };
+
+// For debug logging
+void log(const char* fmt, ...);
 
 }  // namespace rappor
 

@@ -24,15 +24,15 @@ void LibcRandGlobalInit();
 
 // Interface that the encoder requires.  Applications should implement this
 // based on their own.
-class LibcRand : public RapporRandInterface {
+class LibcRand : public RandInterface {
  public:
   // TODO: rename these
   LibcRand(int num_bits, float f, float p, float q)
       : num_bits_(num_bits), f_(f), p_(p), q_(q) {
   }
-  virtual unsigned int f_bits();
-  virtual unsigned int p_bits();
-  virtual unsigned int q_bits();
+  virtual unsigned int f_bits() const;
+  virtual unsigned int p_bits() const;
+  virtual unsigned int q_bits() const;
  private:
   int num_bits_;
   float f_;

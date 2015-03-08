@@ -42,17 +42,17 @@ void LibcRandGlobalInit() {
   gInitialized = true;
 }
 
-unsigned int LibcRand::f_bits() {
+unsigned int LibcRand::f_bits() const {
   assert(gInitialized);
   return randbits(f_, num_bits_);
 }
 
-unsigned int LibcRand::p_bits() {
+unsigned int LibcRand::p_bits() const {
   assert(gInitialized);
   return randbits(p_, num_bits_);
 }
 
-unsigned int LibcRand::q_bits() {
+unsigned int LibcRand::q_bits() const {
   assert(gInitialized);
   return randbits(q_, num_bits_);
 }

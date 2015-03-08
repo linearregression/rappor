@@ -13,18 +13,30 @@
 // limitations under the License.
 
 #include <stdio.h>
+#include <stdarg.h>  // va_list, etc.
 
 #include "rappor.h"
 
 namespace rappor {
 
+void log(const char* fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  vprintf(fmt, args);
+  va_end(args);
+  printf("\n");
+}
+
 Encoder::Encoder(
-    const std::string& metric_name, int cohort, const rappor::Params& params)
-  : params_(params) {
+    const std::string& metric_name, int cohort, const rappor::Params& params,
+    const rappor::RandInterface& rand)
+  : params_(params),
+    rand_(rand) {
 }
 
 bool Encoder::Encode(const std::string& value) {
   printf("encoding\n");
+  log("f_bits: %x", rand_.f_bits());
 }
 
 }  // namespace rappor

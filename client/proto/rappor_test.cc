@@ -13,19 +13,10 @@
 // limitations under the License.
 
 #include <stdio.h>
-#include <stdarg.h>  // va_list, etc.
 
 #include "rappor.pb.h"
 #include "rappor.h"
 #include "libc_rand.h"
-
-void log(const char* fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  vprintf(fmt, args);
-  va_end(args);
-  printf("\n");
-}
 
 // TODO: Should this take params as flags?
 //
@@ -41,18 +32,20 @@ int main() {
   rappor::ReportList reports;
   reports.add_report("dummy");
 
-  rappor::LibcRandGlobalInit();  // seed
-  rappor::LibcRand libc_rand(16, 0.50, 0.50, 0.75);
-
-  log("p_bits: %x", libc_rand.p_bits());
-
-  log("hi %s", reports.report(0).c_str());
-
   rappor::Params p;
   p.set_num_cohorts(128);
-  log("params %s", p.DebugString().c_str());
+  p.set_num_bits(8);
+  p.set_num_hashes(2);
+  rappor::log("params %s", p.DebugString().c_str());
 
-  rappor::Encoder encoder("home-page", 1, p);
+  rappor::LibcRandGlobalInit();  // seed
+  rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.50, 0.75);
+
+  rappor::log("p_bits: %x", libc_rand.p_bits());
+
+  rappor::log("hi %s", reports.report(0).c_str());
+
+  rappor::Encoder encoder("home-page", 1, p, libc_rand);
 
   // what should this return?
   // single report.

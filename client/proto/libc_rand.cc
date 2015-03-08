@@ -57,4 +57,9 @@ unsigned int LibcRand::q_bits() const {
   return randbits(q_, num_bits_);
 }
 
+unsigned int LibcRand::uniform() const {
+  assert(gInitialized);
+  return randbits(0.5, num_bits_);
+}
+
 }  // namespace rappor

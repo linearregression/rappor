@@ -33,6 +33,7 @@ class LibcRand : public RandInterface {
   virtual unsigned int f_bits() const;
   virtual unsigned int p_bits() const;
   virtual unsigned int q_bits() const;
+  virtual unsigned int uniform() const;
  private:
   int num_bits_;
   float f_;

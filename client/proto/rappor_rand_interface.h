@@ -28,6 +28,7 @@ class RandInterface {
   virtual unsigned int f_bits() const = 0;
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;
+  virtual unsigned int uniform() const = 0;
 };
 
 }  // namespace rappor

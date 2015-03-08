@@ -52,7 +52,7 @@ bool Encoder::IsValid() const {
 typedef uint64_t ByteVector; 
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
-  ByteVector bytes;
+  ByteVector bloom;
   //std::string bytes;
   //bytes.reserve(num_bytes_);
 
@@ -67,17 +67,30 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
     unsigned int bit_to_set = h % params_.num_bits();
     log("Hash %d: %d, set bit %d", i, h, bit_to_set);
 
-    bytes |= 1 << bit_to_set;
+    bloom |= 1 << bit_to_set;
   }
 
   // Now do PRR.
 
-  log("f_bits: %x", rand_.f_bits());
+  ByteVector f_bits = rand_.f_bits();
+  log("f_bits: %x", f_bits);
 
+  ByteVector uniform = rand_.uniform();
+  log("uniform: %x", uniform);
+  
+  ByteVector prr = (f_bits & uniform) | (bloom & ~uniform);
+  log("prr: %x", uniform);
 
   // Now do IRR
-  log("p_bits: %x", rand_.p_bits());
-  log("q_bits: %x", rand_.q_bits());
+  ByteVector p_bits = rand_.p_bits();
+  ByteVector q_bits = rand_.q_bits();
+
+  log("p_bits: %x", p_bits);
+  log("q_bits: %x", q_bits);
+
+  ByteVector irr = (p_bits & ~prr) | (q_bits & prr);
+
+  log("irr: %x", irr);
 
   // Copy it into a string, which can go in a protobuf.
   output->reserve(num_bytes_);
@@ -85,8 +98,8 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
     //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte
 
     // "little endian" string
-    output[i] = bytes & 0xFF;  // last byte
-    bytes >>= 8;
+    output[i] = irr & 0xFF;  // last byte
+    irr >>= 8;
   }
 }
 

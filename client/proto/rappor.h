@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#ifndef RAPPOR_H_
+#define RAPPOR_H_
+
 #include <string>
 
 #include "rappor.pb.h"
@@ -20,13 +23,14 @@ namespace rappor {
 
 class Encoder {
  public:
-   Encoder(const rappor::Params& params);
-   // something like StringPiece would be better here
-   // or const char*?
-   bool Encode(const std::string& value);
+  Encoder(const rappor::Params& params);
+  // something like StringPiece would be better here
+  // or const char*?
+  bool Encode(const std::string& value);
  private:
-   const rappor::Params& params_;
+  const rappor::Params& params_;
 };
 
-
 }  // namespace rappor
+
+#endif  // RAPPOR_H_

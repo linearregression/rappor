@@ -14,7 +14,6 @@
 
 #include <stdio.h>
 #include <stdarg.h>  // va_list, etc.
-#include <stdio.h>
 
 #include "rappor.pb.h"
 #include "rappor.h"

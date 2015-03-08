@@ -4,7 +4,10 @@ package rappor;
 message Params {
   optional int32 num_bits = 1;  // k
   optional int32 num_hashes = 2;  // h
-  optional int32 num_cohorts = 3;  // m
+
+  // NOTE: The client does NOT need this.  Client gets a single cohort.  Only
+  // analysis needs it.
+  //optional int32 num_cohorts = 3;  // m
 
   // TODO: Name of hash function?
 }

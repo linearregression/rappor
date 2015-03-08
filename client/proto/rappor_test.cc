@@ -32,7 +32,6 @@ int main() {
   rappor::ReportList reports;
 
   rappor::Params p;
-  p.set_num_cohorts(128);
   p.set_num_bits(8);
   p.set_num_hashes(2);
 

@@ -31,14 +31,18 @@ class Encoder {
   Encoder(
       const std::string& metric_name, int cohort,
       const Params& params, const RandInterface& rand);
+  // Check this immediately after instantiating.  We are not using exceptions.
+  bool IsValid() const;
 
   // something like StringPiece would be better here
   // or const char*?
-  bool Encode(const std::string& value);
+  bool Encode(const std::string& value) const;
 
  private:
   const Params& params_;
   const RandInterface& rand_;
+  int num_bytes_;
+  bool is_valid_;
 };
 
 // For debug logging

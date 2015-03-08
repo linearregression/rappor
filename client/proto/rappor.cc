@@ -28,13 +28,25 @@ void log(const char* fmt, ...) {
 }
 
 Encoder::Encoder(
-    const std::string& metric_name, int cohort, const rappor::Params& params,
-    const rappor::RandInterface& rand)
+    const std::string& metric_name, int cohort,
+    const Params& params, const RandInterface& rand)
   : params_(params),
-    rand_(rand) {
+    rand_(rand),
+    num_bytes_(0),
+    is_valid_(true) {
+  // number of bytes in bloom filter
+  if (params_.num_bits() % 8 == 0) {
+    num_bytes_ = params_.num_bits() / 8;
+  } else {
+    is_valid_ = false;
+  }
 }
 
-bool Encoder::Encode(const std::string& value) {
+bool Encoder::IsValid() const {
+  return is_valid_;
+}
+
+bool Encoder::Encode(const std::string& value) const {
   printf("encoding\n");
   log("f_bits: %x", rand_.f_bits());
 }

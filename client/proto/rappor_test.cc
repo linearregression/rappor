@@ -50,6 +50,8 @@ int main() {
   // what should this return?
   // single report.
   // Then aggregate them all into a report, with params.
-  encoder.Encode("foo");
+  std::string out;
+  encoder.Encode("foo", &out);
 
+  rappor::log("Output: %s", out.c_str());
 }

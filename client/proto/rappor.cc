@@ -46,9 +46,18 @@ bool Encoder::IsValid() const {
   return is_valid_;
 }
 
-bool Encoder::Encode(const std::string& value) const {
+bool Encoder::Encode(const std::string& value, std::string* output) const {
   printf("encoding\n");
   log("f_bits: %x", rand_.f_bits());
+
+  for (int i = 0; i < params_.num_hashes(); ++i) {
+    int h = 5381;
+    for (int j = 0; j < value.size(); ++j) {
+      h = (h << 5) + h + value[j];
+    }
+    log("Hash %d: %d", i, h);
+  }
+  *output = "a";
 }
 
 }  // namespace rappor

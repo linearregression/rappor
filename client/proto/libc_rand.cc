@@ -14,6 +14,7 @@
 
 #include "libc_rand.h"
 
+#include <assert.h>
 #include <stdint.h>  // uint64_t
 //#include <stdio.h>  // printf
 #include <stdlib.h>  // srand
@@ -31,23 +32,29 @@ uint64_t randbits(float p1, int num_bits) {
   return result;
 }
 
-void GlobalInit() {
-  int seed = time(NULL);
-  srand(seed);
-}
+static bool gInitialized = false;
 
 namespace rappor {
 
+void LibcRandGlobalInit() {
+  int seed = time(NULL);
+  srand(seed);
+  gInitialized = true;
+}
+
 unsigned int LibcRand::f_bits() {
-  return 0;
+  assert(gInitialized);
+  return randbits(f_, num_bits_);
 }
 
 unsigned int LibcRand::p_bits() {
-  return 0;
+  assert(gInitialized);
+  return randbits(p_, num_bits_);
 }
 
 unsigned int LibcRand::q_bits() {
-  return 0;
+  assert(gInitialized);
+  return randbits(q_, num_bits_);
 }
 
 }  // namespace rappor

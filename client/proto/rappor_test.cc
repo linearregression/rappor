@@ -41,7 +41,10 @@ int main() {
   rappor::ReportList reports;
   reports.add_report("dummy");
 
-  rappor::LibcRand libc_rand(0.50, 0.50, 0.75);
+  rappor::LibcRandGlobalInit();  // seed
+  rappor::LibcRand libc_rand(16, 0.50, 0.50, 0.75);
+
+  log("p_bits: %x", libc_rand.p_bits());
 
   log("hi %s", reports.report(0).c_str());
 

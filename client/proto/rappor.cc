@@ -37,6 +37,7 @@ Encoder::Encoder(
   // number of bytes in bloom filter
   if (params_.num_bits() % 8 == 0) {
     num_bytes_ = params_.num_bits() / 8;
+    log("num bytes: %d", num_bytes_);
   } else {
     is_valid_ = false;
   }
@@ -46,18 +47,44 @@ bool Encoder::IsValid() const {
   return is_valid_;
 }
 
+typedef std::vector<uint8_t> ByteVector;
+
 bool Encoder::Encode(const std::string& value, std::string* output) const {
-  printf("encoding\n");
-  log("f_bits: %x", rand_.f_bits());
+  // Do we need this?
+  //ByteVector bytes(num_bytes_);
+  std::string bytes;
+  bytes.reserve(num_bytes_);
+
+  // First do hashing
 
   for (int i = 0; i < params_.num_hashes(); ++i) {
     int h = 5381;
     for (int j = 0; j < value.size(); ++j) {
       h = (h << 5) + h + value[j];
     }
-    log("Hash %d: %d", i, h);
+
+    unsigned int hash_value = h % params_.num_bits();
+    log("Hash %d: %d", i, hash_value);
+
+    int byte_index = hash_value / 8;
+    int bit_index = hash_value % 8;
+    bytes[byte_index] |= 1 << bit_index;
   }
-  *output = "a";
+
+  // Now do PRR.
+
+  log("f_bits: %x", rand_.f_bits());
+
+
+  // Now do IRR
+  log("p_bits: %x", rand_.p_bits());
+  log("q_bits: %x", rand_.q_bits());
+
+  // Copy it into a string, which can go in a protobuf.
+  output->reserve(num_bytes_);
+  for (int i = 0; i < num_bytes_; ++i) {
+    output[i] = bytes[i];
+  }
 }
 
 }  // namespace rappor

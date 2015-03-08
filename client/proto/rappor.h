@@ -36,6 +36,7 @@ class Encoder {
 
   // something like StringPiece would be better here
   // or const char*?
+  // output: shoudl be empty string
   bool Encode(const std::string& value, std::string* output) const;
 
  private:

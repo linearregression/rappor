@@ -9,20 +9,13 @@ message Params {
   // TODO: Name of hash function?
 }
 
-message RapporReports {
-  // Which cohort these reports belong to. The RAPPOR participants are
-  // partioned into cohorts in different ways, to allow better statistics and
-  // increased coverage. In particular, the cohort will serve to choose the
-  // hash functions used for Bloom-filter-based reports.
+message ReportListHeader {
+  optional string metric_name = 1;
   optional int32 cohort = 2;
-  message Report {
-    // The name of the metric, hashed.
-    optional fixed64 name_hash = 1;
-    // The sequence of bits produced by random coin flips in
-    // RapporMetric::GetReport(). For a complete description of RAPPOR
-    // metrics, refer to the design document at:
-    // http://www.chromium.org/developers/design-documents/rappor
-    optional bytes bits = 2;
-  }
-  repeated Report report = 3;
+  optional Params params = 3;
+}
+
+message ReportList {
+  optional ReportListHeader header = 1;
+  repeated bytes report = 2;
 }

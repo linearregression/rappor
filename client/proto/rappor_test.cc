@@ -26,17 +26,31 @@ void log(const char* fmt, ...) {
   printf("\n");
 }
 
+// TODO: Should this take params as flags?
+//
+// Then read strings from stdin
+// Assign them cohorts?
+// And then show outputs
+//
+// Outputs should be the report set type?
+// - single protobuf?
+
+
 int main() {
-  rappor::RapporReports r;
-  r.set_cohort(10);
-  log("hi %d", r.cohort());
+  rappor::ReportList reports;
+  reports.add_report("dummy");
+
+  log("hi %s", reports.report(0).c_str());
 
   rappor::Params p;
   p.set_num_cohorts(128);
   log("params %s", p.DebugString().c_str());
 
-  rappor::Encoder encoder(p);
+  rappor::Encoder encoder("home-page", 1, p);
 
   // what should this return?
+  // single report.
+  // Then aggregate them all into a report, with params.
   encoder.Encode("foo");
+
 }

@@ -23,10 +23,18 @@ namespace rappor {
 
 class Encoder {
  public:
-  Encoder(const rappor::Params& params);
+   // TODO:
+   // - Take random interface?  Or hard-code params
+   // - Is hash function hard-coded?
+
+  Encoder(
+      const std::string& metric_name, int cohort,
+      const rappor::Params& params);
+
   // something like StringPiece would be better here
   // or const char*?
   bool Encode(const std::string& value);
+
  private:
   const rappor::Params& params_;
 };

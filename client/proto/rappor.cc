@@ -18,7 +18,8 @@
 
 namespace rappor {
 
-Encoder::Encoder(const rappor::Params& params)
+Encoder::Encoder(
+    const std::string& metric_name, int cohort, const rappor::Params& params)
   : params_(params) {
 }
 

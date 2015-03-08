@@ -1,12 +1,12 @@
 _tmp/rappor.pb.h: rappor.proto
 	protoc --cpp_out _tmp rappor.proto
 
-_tmp/rappor_test: rappor_test.cc _tmp/rappor.pb.h
+_tmp/rappor_test: rappor_test.cc _tmp/rappor.pb.h rappor.cc rappor.h
 # NOTE: -lprotobuf comes after source files
 	g++ \
     -I _tmp \
     -o _tmp/rappor_test \
-    _tmp/rappor.pb.cc rappor_test.cc \
+    _tmp/rappor.pb.cc rappor.cc rappor_test.cc \
     -lprotobuf 
 
 clean:

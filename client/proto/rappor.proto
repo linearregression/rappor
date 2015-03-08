@@ -5,6 +5,8 @@ message Params {
   optional int32 num_bits = 1;  // k
   optional int32 num_hashes = 2;  // h
   optional int32 num_cohorts = 3;  // m
+
+  // TODO: Name of hash function?
 }
 
 message RapporReports {

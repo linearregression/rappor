@@ -12,32 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <stdio.h>
-#include <stdarg.h>  // va_list, etc.
-#include <stdio.h>
+#include <string>
 
 #include "rappor.pb.h"
-#include "rappor.h"
 
-void log(const char* fmt, ...) {
-  va_list args;
-  va_start(args, fmt);
-  vprintf(fmt, args);
-  va_end(args);
-  printf("\n");
-}
+namespace rappor {
 
-int main() {
-  rappor::RapporReports r;
-  r.set_cohort(10);
-  log("hi %d", r.cohort());
+class Encoder {
+ public:
+   Encoder(const rappor::Params& params);
+   // something like StringPiece would be better here
+   // or const char*?
+   bool Encode(const std::string& value);
+ private:
+   const rappor::Params& params_;
+};
 
-  rappor::Params p;
-  p.set_num_cohorts(128);
-  log("params %s", p.DebugString().c_str());
 
-  rappor::Encoder encoder(p);
-
-  // what should this return?
-  encoder.Encode("foo");
-}
+}  // namespace rappor

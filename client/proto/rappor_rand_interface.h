@@ -34,6 +34,22 @@ class RandInterface {
   virtual unsigned int uniform() const = 0;
 };
 
+// Rename above to RandomBitInterface?
+
+class DeterministicRandInterface {
+ public:
+  // NOTE: unsigned int for now.  Caller has to make sure it bits match
+  // the internal bloom filter size?
+  // 
+  // TODO: How about define the ByteVector type here?
+
+  void Init(const std::string& secret);  // secret per client
+
+  // Seed with the DRBG state to the value, so you always get the same value,
+  // but it's unpredictable without knowing the secret.
+  unsigned int RandomBits(const std::string value);  // state
+};
+
 }  // namespace rappor
 
 #endif  // RAPPOR_RAND_INTERFACE_H_

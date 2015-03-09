@@ -2,7 +2,8 @@ _tmp/rappor.pb.h: rappor.proto
 	protoc --cpp_out _tmp rappor.proto
 
 _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
-                  libc_rand.cc libc_rand.h rappor_test.cc 
+                  rappor_rand_interface.h libc_rand.cc libc_rand.h \
+									rappor_test.cc 
 # NOTE: -lprotobuf comes after source files
 	g++ \
     -I _tmp \

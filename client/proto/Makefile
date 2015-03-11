@@ -22,10 +22,10 @@ _tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
 
 # c++0x for std::array
 		#-std=c++0x 
-_tmp/hmac_openssl_test: hmac_openssl_test.cc
+_tmp/hmac_openssl_test: hmac_openssl_test.cc openssl_impl.cc
 	$(CXX) \
     -o _tmp/hmac_openssl_test \
-    hmac_openssl_test.cc \
+    hmac_openssl_test.cc openssl_impl.cc \
 	  -lcrypto
 # OpenSSL provides libssl or libcrypto
 

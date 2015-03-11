@@ -19,6 +19,9 @@
 
 namespace rappor {
 
+// NOTE: If using C++11 (-std=c++0x), it's safer to do this:
+// typedef std::array<unsigned char, 32> Sha256Digest;
+
 typedef unsigned char Md5Digest[16];
 typedef unsigned char Sha256Digest[32];
 

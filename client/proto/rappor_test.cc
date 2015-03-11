@@ -73,11 +73,11 @@ int main() {
   rappor::LibcRandGlobalInit();  // seed
   rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.75);
 
-  /*
   int cohort = 9;
   const char* metric_name = "home-page";
-  rappor::Encoder encoder(metric_name, cohort, p, &libc_d_rand, libc_rand);
+  rappor::Encoder2 encoder(metric_name, cohort, p, &libc_d_rand, libc_rand);
   assert(encoder.IsValid());  // bad instantiation
+  /*
 
   // TODO: loop over stdin
   for (int i = 0; i < 5; ++i) {

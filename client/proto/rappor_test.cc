@@ -17,6 +17,7 @@
 #include "rappor.pb.h"
 #include "rappor.h"
 #include "libc_rand.h"
+#include "rappor_deps.h"
 
 // TODO: Should this take params as flags?
 //

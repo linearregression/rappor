@@ -15,5 +15,10 @@ _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
     -lprotobuf \
     -lrt
 
+_tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
+	$(CXX) \
+    -o _tmp/hmac_drbg_test \
+    byte_vector_utils.cc
+
 clean:
 	rm _tmp/* || true

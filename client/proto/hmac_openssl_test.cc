@@ -4,8 +4,17 @@
 #include <string>
 
 
+//#define CXX_11 0
+
+#ifdef CXX_11
+  #include <array>
+  typedef std::array<unsigned char, 32> Sha256Digest;
+#else
+  typedef unsigned char Sha256Digest[32];
+#endif
+
 bool Hmac(const std::string& key, const std::string& value,
-          unsigned char* output) {
+          Sha256Digest* output) {
   return HMAC(EVP_sha256(),
               key.c_str(), key.size(),
               // Why static_cast here?  Chrome hmac_opeenl.cc needs that too.
@@ -13,7 +22,11 @@ bool Hmac(const std::string& key, const std::string& value,
               reinterpret_cast<const unsigned char*>(value.c_str()),
               value.size(),
 
-              output,
+#ifdef CXX_11
+              output->data(),
+#else
+              *output,
+#endif
               NULL);
 }
 
@@ -24,7 +37,8 @@ int main() {
   std::string key("key");
   std::string value("value");
   //std::string digest(32);  // 32 bytes
-  unsigned char digest[32];
+  //unsigned char digest[32];
+  Sha256Digest digest;
 
   /*
   ScopedOpenSSLSafeSizeBuffer<EVP_MAX_MD_SIZE> result(digest, digest_length);
@@ -33,11 +47,17 @@ int main() {
                   reinterpret_cast<const unsigned char*>(data.data()),
                   data.size(), result.safe_buffer(), NULL);
   */
-
-  bool result = Hmac(key, value, digest);
+  bool result = Hmac(key, value, &digest);
   printf("result: %d\n", result);
   printf("digest: \n");
-  for (int i = 0; i < sizeof(digest); ++i) {
+
+#ifdef CXX_11
+  const int n = digest.size();
+#else
+  const int n = sizeof(digest);
+#endif
+
+  for (int i = 0; i < n; ++i) {
     printf("%x", digest[i]);
   }
   printf("\n");

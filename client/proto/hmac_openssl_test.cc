@@ -24,7 +24,7 @@ int main() {
   std::string key("key");
   std::string value("value");
   //std::string digest(32);  // 32 bytes
-  unsigned char digest[32 + 1];
+  unsigned char digest[32];
 
   /*
   ScopedOpenSSLSafeSizeBuffer<EVP_MAX_MD_SIZE> result(digest, digest_length);
@@ -37,7 +37,8 @@ int main() {
   bool result = Hmac(key, value, digest);
   printf("result: %d\n", result);
   printf("digest: \n");
-  for (int i = 0; i < 32; ++i) {
-    printf("%x ", digest[i]);
+  for (int i = 0; i < sizeof(digest); ++i) {
+    printf("%x", digest[i]);
   }
+  printf("\n");
 }

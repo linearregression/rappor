@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <string>
 
+// NOTE: If using C++11 (-std=c++0x), it's safer to do this:
+// typedef std::array<unsigned char, 32> Sha256Digest;
+
 typedef unsigned char Sha256Digest[32];
 
 bool Hmac(const std::string& key, const std::string& value,

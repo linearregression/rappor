@@ -163,13 +163,16 @@ bool Encoder2::IsValid() const {
 }
 
 void PrintMd5(Md5Digest md5) {
-  for (int i = 0; i < sizeof(md5); ++i) {
+  // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
+  for (int i = 0; i < sizeof(Md5Digest); ++i) {
+    //printf("[%d]\n", i);
     printf("%02x", md5[i]);
   }
+  printf("\n");
 }
 
 bool Encoder2::Encode(const std::string& value, std::string* output) const {
-  ByteVector bloom;
+  ByteVector bloom = 0;
 
   // First do hashing.
 
@@ -180,18 +183,13 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   int num_bits = params_.num_bits();
 
   // We don't need the full precision
-  //
   // Another option: use each byte.  3-7 bits each is fine.
-  uint64_t hash = md5[0] | md5[1] << 8;
 
   for (int i = 0; i < params_.num_hashes(); ++i) {
-    // This is the same as md5 & mask, where mask is (1 << log2(num_bits) - 1.
-    // e.g. 0x07 for 3 bits.
-    int bit_to_set = hash % num_bits;
-    log("Hash %d: %d, set bit %d", i, hash, bit_to_set);
-
+    // 1 byte per hash for now
+    int bit_to_set = md5[i] % num_bits;
     bloom |= 1 << bit_to_set;
-    hash >> hash_part_width_;
+    log("Hash %d, set bit %d", i, bit_to_set);
   }
   /*
 

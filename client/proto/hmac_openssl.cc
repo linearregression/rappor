@@ -2,17 +2,19 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-#include "crypto/hmac.h"
+#include "hmac.h"
 
 #include <openssl/hmac.h>
 
 #include <algorithm>
 #include <vector>
 
+/*
 #include "base/logging.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/stl_util.h"
 #include "crypto/openssl_util.h"
+*/
 
 namespace crypto {
 

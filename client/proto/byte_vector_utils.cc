@@ -6,6 +6,8 @@
 
 #include <string>
 
+#include "hmac.h"
+
 /*
 #include "base/logging.h"
 #include "base/rand_util.h"

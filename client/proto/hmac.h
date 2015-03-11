@@ -8,11 +8,13 @@
 #ifndef CRYPTO_HMAC_H_
 #define CRYPTO_HMAC_H_
 
+/*
 #include "base/basictypes.h"
 #include "base/compiler_specific.h"
 #include "base/memory/scoped_ptr.h"
 #include "base/strings/string_piece.h"
 #include "crypto/crypto_export.h"
+*/
 
 namespace crypto {
 
@@ -20,7 +22,7 @@ namespace crypto {
 struct HMACPlatformData;
 class SymmetricKey;
 
-class CRYPTO_EXPORT HMAC {
+class HMAC {
  public:
   // The set of supported hash functions. Extend as required.
   enum HashAlgorithm {
@@ -46,15 +48,15 @@ class CRYPTO_EXPORT HMAC {
   // this requirement is gone.  But a system crypto library may still enforce
   // this old requirement.  If the key is shorter than this recommended value,
   // Init() may fail.
-  bool Init(const unsigned char* key, size_t key_length) WARN_UNUSED_RESULT;
+  bool Init(const unsigned char* key, size_t key_length); // WARN_UNUSED_RESULT;
 
   // Initializes this instance using |key|. Call Init
   // only once. It returns false on the second or later calls.
-  bool Init(SymmetricKey* key) WARN_UNUSED_RESULT;
+  bool Init(SymmetricKey* key); // WARN_UNUSED_RESULT;
 
   // Initializes this instance using |key|. Call Init only once. It returns
   // false on the second or later calls.
-  bool Init(const base::StringPiece& key) WARN_UNUSED_RESULT {
+  bool Init(const base::StringPiece& key) {
     return Init(reinterpret_cast<const unsigned char*>(key.data()),
                 key.size());
   }
@@ -63,7 +65,7 @@ class CRYPTO_EXPORT HMAC {
   // to the constructor and the key supplied to the Init method. The HMAC is
   // returned in |digest|, which has |digest_length| bytes of storage available.
   bool Sign(const base::StringPiece& data, unsigned char* digest,
-            size_t digest_length) const WARN_UNUSED_RESULT;
+            size_t digest_length) const;
 
   // Verifies that the HMAC for the message in |data| equals the HMAC provided
   // in |digest|, using the algorithm supplied to the constructor and the key
@@ -73,13 +75,13 @@ class CRYPTO_EXPORT HMAC {
   // undermine the cryptographic integrity. |digest| must be exactly
   // |DigestLength()| bytes long.
   bool Verify(const base::StringPiece& data,
-              const base::StringPiece& digest) const WARN_UNUSED_RESULT;
+              const base::StringPiece& digest) const;
 
   // Verifies a truncated HMAC, behaving identical to Verify(), except
   // that |digest| is allowed to be smaller than |DigestLength()|.
   bool VerifyTruncated(
       const base::StringPiece& data,
-      const base::StringPiece& digest) const WARN_UNUSED_RESULT;
+      const base::StringPiece& digest) const;
 
  private:
   HashAlgorithm hash_alg_;

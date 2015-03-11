@@ -17,6 +17,8 @@
 #include "crypto/hmac.h"
 */
 
+#include "hmac.h"
+
 namespace rappor {
 
 // from rappor_parameters.h
@@ -92,7 +94,7 @@ class HmacByteVectorGenerator : public ByteVectorGenerator {
                           const std::string& entropy_input,
                           const std::string& personalization_string);
 
-  ~HmacByteVectorGenerator() override;
+  ~HmacByteVectorGenerator(); // override;
 
   // Generates a random string suitable for passing to the constructor as
   // |entropy_input|.
@@ -107,7 +109,7 @@ class HmacByteVectorGenerator : public ByteVectorGenerator {
   explicit HmacByteVectorGenerator(const HmacByteVectorGenerator& prev_request);
 
   // ByteVector implementation:
-  ByteVector GetRandomByteVector() override;
+  ByteVector GetRandomByteVector(); // override;
 
  private:
   // HMAC initalized with the value of "Key" HMAC_DRBG_Initialize.
@@ -119,7 +121,7 @@ class HmacByteVectorGenerator : public ByteVectorGenerator {
   // Total number of bytes streamed from the HMAC_DRBG Generate Process.
   size_t generated_bytes_;
 
-  DISALLOW_ASSIGN(HmacByteVectorGenerator);
+  //DISALLOW_ASSIGN(HmacByteVectorGenerator);
 };
 
 }  // namespace rappor

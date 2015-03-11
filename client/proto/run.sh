@@ -48,4 +48,8 @@ copy() {
   cp -v _tmp/crypto/{hmac.h,hmac_openssl.cc} .
 }
 
+count() {
+  wc -l hmac* byte_vector_utils*
+}
+
 "$@"

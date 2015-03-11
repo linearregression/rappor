@@ -47,6 +47,8 @@ class DeterministicRandInterface {
   virtual void seed(const std::string& seed) = 0;  // mutates internal state
 };
 
+// NOTE: All 3 need num_bits?
+
 // Instead of the above
 class PermanentHashInterface {
  public:
@@ -84,6 +86,36 @@ class RandInterface {
 //   - Windows-specific random interface
 // - libc rand
 // - HMAC DRBG (using the same secret)
+
+class BloomInterface {
+ public:
+  // Return an interface with 'num_hashes' bits
+  virtual void Hash(const std::string& value) = 0;
+ protected:
+  BloomInterface(int num_hashes)
+      : num_hashes_(num_hashes) {
+  }
+  int num_hashes_;
+};
+
+// One strategy, have 3 interfaces:
+// - Bloom filter
+// - PRR
+// - IRR
+
+// Other strategy:
+// - just ask for:
+//   - md5
+//   - hmac-sha1
+//   - secret
+//
+// Then you can do all 3 of them
+//   Bloom filter gets md5
+//   PRR gets hmac-sha1 and secret
+//   IRR could get a real interface -- /dev/urandom or other
+//
+// There's no point in providing LibcDeterministicRand.  You need OpenSSL or
+// NaCl for hash functions anyway!  It's overly general.
 
 }  // namespace rappor
 

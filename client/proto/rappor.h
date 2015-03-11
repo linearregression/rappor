@@ -77,6 +77,7 @@ class Encoder2 {
   HmacFunc* hmac_func_;
   const IrrRandInterface& irr_rand_;
   int num_bytes_;
+  int hash_part_width_;  // log2(num_bits)
   bool is_valid_;
 };
 

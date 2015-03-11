@@ -1,13 +1,14 @@
-#include <openssl/evp.h>
-#include <openssl/hmac.h>
-#include <openssl/md5.h>
+#include <openssl/evp.h>  // EVP_sha256
+#include <openssl/hmac.h>  // HMAC
+#include <openssl/md5.h>  // MD5
+#include <openssl/sha.h>  // SHA256_DIGEST_LENGTH
 #include <stdio.h>
 #include <string>
 
 // NOTE: If using C++11 (-std=c++0x), it's safer to do this:
 // typedef std::array<unsigned char, 32> Sha256Digest;
 
-typedef unsigned char Sha256Digest[32];
+typedef unsigned char Sha256Digest[SHA256_DIGEST_LENGTH];
 
 bool Hmac(const std::string& key, const std::string& value,
           Sha256Digest output) {
@@ -20,7 +21,7 @@ bool Hmac(const std::string& key, const std::string& value,
               NULL);
 }
 
-typedef unsigned char Md5Digest[16];
+typedef unsigned char Md5Digest[MD5_DIGEST_LENGTH];  // 16
 
 bool Md5(const std::string& value, Md5Digest output) {
   // std::string has 'char', OpenSSL wants unsigned char.

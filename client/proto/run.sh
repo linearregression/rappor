@@ -45,7 +45,8 @@ extract() {
 
 copy() {
   #cp -v _tmp/chrome/byte_vector_utils* .
-  cp -v _tmp/crypto/{hmac.h,hmac_openssl.cc} .
+  #cp -v _tmp/crypto/{hmac.h,hmac_openssl.cc} .
+  cp -v _tmp/crypto/hmac.cc .
 }
 
 count() {

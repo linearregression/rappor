@@ -28,6 +28,14 @@
 // - RandInterface could also be this, or it could be /dev/urandom
 namespace rappor {
 
+// Alternative API:
+//
+// f_bits, uniform = det_rand.GetMasks(value)
+//
+// underneath, this is implemented with
+// 1. hmac_drbg.seed(value)
+// 2. extract enough bits to get f prob, then uniform
+
 class DeterministicRandInterface {
  public:
   // NOTE: unsigned int for now.  Caller has to make sure it bits match

@@ -51,6 +51,35 @@ class Encoder {
   bool is_valid_;
 };
 
+class Encoder2 {
+ public:
+  // TODO:
+  // - Take HmacFunc, Md5Func, IrrInterface
+  // - Params -> ClientParams?
+  //   - this has cohorts, while AnalysisParams has num_cohorts
+
+  Encoder2(
+      const std::string& metric_name, int cohort, const Params& params,
+      Md5Func* md5_func, HmacFunc* hmac_func,
+      const IrrRandInterface& irr_rand);
+  // Check this immediately after instantiating.  We are not using exceptions.
+  bool IsValid() const;
+
+  // something like StringPiece would be better here
+  // or const char*?
+  // output: shoudl be empty string
+  bool Encode(const std::string& value, std::string* output) const;
+
+ private:
+  int cohort_;
+  const Params& params_;
+  Md5Func* md5_func_;
+  HmacFunc* hmac_func_;
+  const IrrRandInterface& irr_rand_;
+  int num_bytes_;
+  bool is_valid_;
+};
+
 // For debug logging
 void log(const char* fmt, ...);
 

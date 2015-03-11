@@ -33,16 +33,16 @@ typedef unsigned char Sha256Digest[32];
 // string -> string?  But you need to know how many bits there are.
 // num_hashes * log2(num_bits) == 2 * log2(8) = 6, or 2 * log2(128) = 14.
 
-typedef bool Md5(const std::string& value, Md5Digest output);
+typedef bool Md5Func(const std::string& value, Md5Digest output);
 typedef bool HmacFunc(const std::string& key, const std::string& value,
                       Sha256Digest output);
 
-class InstantaneousRandInterface {
+class IrrRandInterface {
  public:
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;
  protected:
-  InstantaneousRandInterface(float p, float q)
+  IrrRandInterface(float p, float q)
       : p_(p), q_(q) {
   }
   float p_;

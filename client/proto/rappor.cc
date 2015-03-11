@@ -111,4 +111,28 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   }
 }
 
+Encoder2::Encoder2(
+    const std::string& metric_name, int cohort, const Params& params,
+    Md5Func* md5_func, HmacFunc* hmac_func, const IrrRandInterface& irr_rand)
+    : cohort_(cohort),
+      params_(params),
+      md5_func_(md5_func),
+      hmac_func_(hmac_func),
+      irr_rand_(irr_rand),
+      num_bytes_(0),
+      is_valid_(true) {
+  // number of bytes in bloom filter
+  if (params_.num_bits() % 8 == 0) {
+    num_bytes_ = params_.num_bits() / 8;
+    log("num bytes: %d", num_bytes_);
+  } else {
+    is_valid_ = false;
+  }
+}
+
+bool Encoder2::IsValid() const {
+  return is_valid_;
+}
+
+
 }  // namespace rappor

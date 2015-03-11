@@ -22,18 +22,30 @@ hmac-drbg-test() {
   _tmp/hmac_drbg_test
 }
 
+get() {
+  wget --no-clobber --directory _tmp "$@"
+}
+
 download() {
-  wget https://chromium.googlesource.com/chromium/src/+archive/master/components/rappor.tar.gz
+  get https://chromium.googlesource.com/chromium/src/+archive/master/components/rappor.tar.gz
+  get https://chromium.googlesource.com/chromium/src/+archive/master/crypto.tar.gz
 }
 
 extract() {
-  mkdir _tmp/chrome
-  cd _tmp/chrome
-  tar xvf ../../rappor.tar.gz
+  mkdir -p _tmp/chrome _tmp/crypto
+
+  pushd _tmp/chrome
+  tar xvf ../rappor.tar.gz
+  popd
+
+  pushd _tmp/crypto
+  tar xvf ../crypto.tar.gz
+  popd
 }
 
 copy() {
-  cp _tmp/chrome/byte_vector_utils* .
+  #cp -v _tmp/chrome/byte_vector_utils* .
+  cp -v _tmp/crypto/{hmac.h,hmac_openssl.cc} .
 }
 
 "$@"

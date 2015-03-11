@@ -18,7 +18,7 @@ _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
 _tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
 	$(CXX) \
     -o _tmp/hmac_drbg_test \
-    byte_vector_utils.cc
+    byte_vector_utils.cc hmac_openssl.cc
 
 clean:
 	rm _tmp/* || true

@@ -17,4 +17,14 @@ rappor-test() {
   _tmp/rappor_test
 }
 
+download() {
+  wget https://chromium.googlesource.com/chromium/src/+archive/master/components/rappor.tar.gz
+}
+
+extract() {
+  mkdir _tmp/chrome
+  cd _tmp/chrome
+  tar xvf ../../rappor.tar.gz
+}
+
 "$@"

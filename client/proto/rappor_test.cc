@@ -44,7 +44,6 @@ int main() {
   assert(encoder.IsValid());  // bad instantiation
 
   // TODO: loop over stdin
-
   for (int i = 0; i < 5; ++i) {
     std::string out;
     encoder.Encode("foo", &out);

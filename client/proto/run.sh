@@ -72,4 +72,8 @@ print m.hexdigest()
 ' "key" "value"
 }
 
+test-md5() {
+  echo -n value | md5sum
+}
+
 "$@"

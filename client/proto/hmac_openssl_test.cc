@@ -1,5 +1,6 @@
 #include <openssl/evp.h>
 #include <openssl/hmac.h>
+#include <openssl/md5.h>
 #include <stdio.h>
 #include <string>
 
@@ -19,18 +20,37 @@ bool Hmac(const std::string& key, const std::string& value,
               NULL);
 }
 
+typedef unsigned char Md5Digest[16];
+
+bool Md5(const std::string& value, Md5Digest output) {
+  // std::string has 'char', OpenSSL wants unsigned char.
+  MD5(reinterpret_cast<const unsigned char*>(value.c_str()),
+      value.size(), output);
+  return true;
+}
+
 int main() {
   std::string key("key");
   std::string value("value");
-  Sha256Digest digest;
+  Sha256Digest sha256;
 
-  bool result = Hmac(key, value, digest);
+  bool result = Hmac(key, value, sha256);
   printf("result: %d\n", result);
   printf("digest:\n");
 
-  const int n = sizeof(digest);
+  const int n = sizeof(sha256);
   for (int i = 0; i < n; ++i) {
-    printf("%x", digest[i]);
+    printf("%02x", sha256[i]);
+  }
+  printf("\n");
+
+  Md5Digest md5;
+
+  bool ok = Md5(value, md5);
+  printf("ok: %d\n", ok);
+
+  for (int i = 0; i < sizeof(md5); ++i) {
+    printf("%02x", md5[i]);
   }
   printf("\n");
 }

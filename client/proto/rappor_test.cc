@@ -80,7 +80,6 @@ int main() {
       metric_name, cohort, params, rappor::Md5, rappor::Hmac, libc_rand);
 
   assert(encoder.IsValid());  // bad instantiation
-  /*
 
   // TODO: loop over stdin
   for (int i = 0; i < 5; ++i) {
@@ -94,8 +93,7 @@ int main() {
   // client params?
   header->set_metric_name(metric_name);
   header->set_cohort(cohort);
-  header->mutable_params()->CopyFrom(p);
+  header->mutable_params()->CopyFrom(params);
 
   rappor::log("report list %s", reports.DebugString().c_str());
-  */
 }

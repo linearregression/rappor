@@ -47,11 +47,43 @@ class DeterministicRandInterface {
   virtual void seed(const std::string& seed) = 0;  // mutates internal state
 };
 
+// Instead of the above
+class PermanentHashInterface {
+ public:
+  virtual void Hash(const std::string& value) = 0;
+ protected:
+  PermanentHashInterface(const std::string& secret, float f)
+      : secret_(secret), f_(f) {
+  }
+  const std::string& secret_;
+  float f_;
+};
+
+// Example implementations:
+// - hmac from OpenSSL
+// - hmac from NaCl
+// - libc rand: seed with srand(hash(value)), then call rand()
+
+// TODO: Rename to InstantaneousHashInterface
+
 class RandInterface {
  public:
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;
+ protected:
+  RandInterface(float p, float q)
+      : p_(p), q_(q) {
+  }
+  float p_;
+  float q_;
 };
+
+// Example implementations:
+// - OS specific randomness
+//   - /dev/urandom on Unix
+//   - Windows-specific random interface
+// - libc rand
+// - HMAC DRBG (using the same secret)
 
 }  // namespace rappor
 

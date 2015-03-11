@@ -28,14 +28,13 @@ class LibcRand : public RandInterface {
  public:
   // TODO: rename these
   LibcRand(int num_bits, float p, float q)
-      : num_bits_(num_bits), p_(p), q_(q) {
+      : RandInterface(p, q),
+        num_bits_(num_bits) {
   }
   virtual unsigned int p_bits() const;
   virtual unsigned int q_bits() const;
  private:
   int num_bits_;
-  float p_;
-  float q_;
 };
 
 class LibcDeterministicRand : public DeterministicRandInterface {

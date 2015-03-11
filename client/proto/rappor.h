@@ -19,14 +19,16 @@
 
 #include "rappor.pb.h"
 #include "rappor_rand_interface.h"
+#include "rappor_deps.h"  // for dependency injection
 
 namespace rappor {
 
 class Encoder {
  public:
-   // TODO:
-   // - Take random interface?  Or hard-code params
-   // - Is hash function hard-coded?
+  // TODO:
+  // - Take HmacFunc, Md5Func, IrrInterface
+  // - Params -> ClientParams?
+  //   - this has cohorts, while AnalysisParams has num_cohorts
 
   Encoder(
       const std::string& metric_name, int cohort, const Params& params,

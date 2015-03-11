@@ -29,6 +29,10 @@ typedef unsigned char Sha256Digest[32];
 //   NOTE: libc rand returns a float between 0 and 1.
 // Maybe you just need to return p_bits and q_bits.
 
+// NOTE: is md5 always sufficient?  Maybe you should have a generic hash.
+// string -> string?  But you need to know how many bits there are.
+// num_hashes * log2(num_bits) == 2 * log2(8) = 6, or 2 * log2(128) = 14.
+
 typedef bool Md5(const std::string& value, Md5Digest output);
 typedef bool HmacFunc(const std::string& key, const std::string& value,
                       Sha256Digest output);

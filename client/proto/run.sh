@@ -22,6 +22,11 @@ hmac-drbg-test() {
   _tmp/hmac_drbg_test
 }
 
+hmac-openssl-test() {
+  make _tmp/hmac_openssl_test
+  _tmp/hmac_openssl_test
+}
+
 get() {
   wget --no-clobber --directory _tmp "$@"
 }

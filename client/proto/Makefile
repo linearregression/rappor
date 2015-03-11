@@ -20,5 +20,12 @@ _tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
     -o _tmp/hmac_drbg_test \
     byte_vector_utils.cc hmac_openssl.cc
 
+_tmp/hmac_openssl_test: hmac_openssl_test.cc
+	$(CXX) \
+    -o _tmp/hmac_openssl_test \
+    hmac_openssl_test.cc \
+	  -lcrypto
+# OpenSSL provides libssl or libcrypto
+
 clean:
 	rm _tmp/* || true

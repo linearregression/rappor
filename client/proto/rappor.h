@@ -29,9 +29,9 @@ class Encoder {
    // - Is hash function hard-coded?
 
   Encoder(
-      const std::string& metric_name, int cohort,
-      const Params& params, const RandInterface& rand,
-      DeterministicRandInterface* det_rand);
+      const std::string& metric_name, int cohort, const Params& params,
+      DeterministicRandInterface* det_rand,
+      const RandInterface& rand);
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
@@ -41,9 +41,10 @@ class Encoder {
   bool Encode(const std::string& value, std::string* output) const;
 
  private:
+  int cohort_;
   const Params& params_;
-  const RandInterface& rand_;
   DeterministicRandInterface* det_rand_;
+  const RandInterface& rand_;
   int num_bytes_;
   bool is_valid_;
 };

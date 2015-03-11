@@ -28,10 +28,11 @@ void log(const char* fmt, ...) {
 }
 
 Encoder::Encoder(
-    const std::string& metric_name, int cohort,
-    const Params& params, const RandInterface& rand,
-    DeterministicRandInterface* det_rand)
-  : params_(params),
+    const std::string& metric_name, int cohort, const Params& params,
+    DeterministicRandInterface* det_rand,
+    const RandInterface& rand)
+  : cohort_(cohort),
+    params_(params),
     rand_(rand),
     det_rand_(det_rand),
     num_bytes_(0),

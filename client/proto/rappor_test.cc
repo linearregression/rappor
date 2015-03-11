@@ -27,7 +27,6 @@
 // Outputs should be the report set type?
 // - single protobuf?
 
-
 int main() {
   rappor::ReportList reports;
 
@@ -41,7 +40,8 @@ int main() {
 
   int cohort = 9;
   const char* metric_name = "home-page";
-  rappor::Encoder encoder(metric_name, cohort, p, libc_rand, &libc_d_rand);
+  rappor::Encoder encoder(metric_name, cohort, p, &libc_d_rand, libc_rand);
+  assert(encoder.IsValid());  // bad instantiation
 
   // TODO: loop over stdin
 

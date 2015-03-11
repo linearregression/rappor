@@ -34,32 +34,62 @@ uint64_t randbits(float p1, int num_bits) {
 
 static bool gInitialized = false;
 
+
+static void SeedWithTime() {
+  // This only has second resolution, and isn't good enough.
+  //int seed = time(NULL);
+
+  timespec ts;
+  // clock_gettime(CLOCK_MONOTONIC, &ts); // Works on FreeBSD
+  clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
+
+  srand(ts.tv_nsec);  // seed with nanoseconds
+}
+
 namespace rappor {
 
 void LibcRandGlobalInit() {
-  int seed = time(NULL);
-  srand(seed);
+  SeedWithTime();
   gInitialized = true;
-}
-
-unsigned int LibcRand::f_bits() const {
-  assert(gInitialized);
-  return randbits(f_, num_bits_);
 }
 
 unsigned int LibcRand::p_bits() const {
   assert(gInitialized);
+  SeedWithTime();  // non-deterministic IRR
   return randbits(p_, num_bits_);
 }
 
 unsigned int LibcRand::q_bits() const {
   assert(gInitialized);
+  SeedWithTime();  // non-deterministic IRR
   return randbits(q_, num_bits_);
 }
 
-unsigned int LibcRand::uniform() const {
+//
+// LibcDeterministicRand
+//
+
+unsigned int LibcDeterministicRand::f_bits() const {
+  assert(gInitialized);
+  return randbits(f_, num_bits_);
+}
+
+unsigned int LibcDeterministicRand::uniform() const {
   assert(gInitialized);
   return randbits(0.5, num_bits_);
+}
+
+// NOTE: The libc RNG is global, so we are mutating the LibcRand state too!
+// This probably isn't good, but this is insecure anyway.
+void LibcDeterministicRand::seed(const std::string& seed) {
+  assert(gInitialized);
+
+  // hash the seed string into an integer, then pass to libc.
+  int h = 5381;
+  for (int i = 0; i < seed.size(); ++i) {
+    h = (h << 5) + h + seed[i];
+  }
+  srand(h);
 }
 
 }  // namespace rappor

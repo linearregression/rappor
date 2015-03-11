@@ -30,7 +30,8 @@ class Encoder {
 
   Encoder(
       const std::string& metric_name, int cohort,
-      const Params& params, const RandInterface& rand);
+      const Params& params, const RandInterface& rand,
+      DeterministicRandInterface* det_rand);
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
@@ -42,6 +43,7 @@ class Encoder {
  private:
   const Params& params_;
   const RandInterface& rand_;
+  DeterministicRandInterface* det_rand_;
   int num_bytes_;
   bool is_valid_;
 };

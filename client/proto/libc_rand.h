@@ -27,18 +27,28 @@ void LibcRandGlobalInit();
 class LibcRand : public RandInterface {
  public:
   // TODO: rename these
-  LibcRand(int num_bits, float f, float p, float q)
-      : num_bits_(num_bits), f_(f), p_(p), q_(q) {
+  LibcRand(int num_bits, float p, float q)
+      : num_bits_(num_bits), p_(p), q_(q) {
   }
-  virtual unsigned int f_bits() const;
   virtual unsigned int p_bits() const;
   virtual unsigned int q_bits() const;
+ private:
+  int num_bits_;
+  float p_;
+  float q_;
+};
+
+class LibcDeterministicRand : public DeterministicRandInterface {
+ public:
+  LibcDeterministicRand(int num_bits, float f)
+      : num_bits_(num_bits), f_(f) {
+  }
+  virtual unsigned int f_bits() const;
   virtual unsigned int uniform() const;
+  virtual void seed(const std::string& seed);  // mutates internal state
  private:
   int num_bits_;
   float f_;
-  float p_;
-  float q_;
 };
 
 }  // namespace rappor

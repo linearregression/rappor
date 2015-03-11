@@ -36,11 +36,12 @@ int main() {
   p.set_num_hashes(2);
 
   rappor::LibcRandGlobalInit();  // seed
-  rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.50, 0.75);
+  rappor::LibcDeterministicRand libc_d_rand(p.num_bits(), 0.50);
+  rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.75);
 
   int cohort = 9;
   const char* metric_name = "home-page";
-  rappor::Encoder encoder(metric_name, cohort, p, libc_rand);
+  rappor::Encoder encoder(metric_name, cohort, p, libc_rand, &libc_d_rand);
 
   // TODO: loop over stdin
 

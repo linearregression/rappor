@@ -29,9 +29,11 @@ void log(const char* fmt, ...) {
 
 Encoder::Encoder(
     const std::string& metric_name, int cohort,
-    const Params& params, const RandInterface& rand)
+    const Params& params, const RandInterface& rand,
+    DeterministicRandInterface* det_rand)
   : params_(params),
     rand_(rand),
+    det_rand_(det_rand),
     num_bytes_(0),
     is_valid_(true) {
   // number of bytes in bloom filter
@@ -70,12 +72,17 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
 
   // Do PRR.
 
-  ByteVector f_bits = rand_.f_bits();
+  // Seed it every time, for deterministic PRR.  This is equivalent to
+  // memoization, as described in the paper, and is memory-efficient.
+  det_rand_->seed(value);
+  ByteVector f_bits = det_rand_->f_bits();
   log("f_bits: %x", f_bits);
 
-  ByteVector uniform = rand_.uniform();
+  ByteVector uniform = det_rand_->uniform();
   log("uniform: %x", uniform);
   
+  // first term: 1 with (1/2 + f/2) probability
+  // second term: 0 with 1/2 probability, B with 1/2 probability
   ByteVector prr = (f_bits & uniform) | (bloom & ~uniform);
   log("prr: %x", uniform);
 

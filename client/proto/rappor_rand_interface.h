@@ -28,10 +28,11 @@ class RandInterface {
   // 
   // TODO: How about define the ByteVector type here?
 
-  virtual unsigned int f_bits() const = 0;
+  // NOTE: These two need to be deterministic.  Maybe we can just provide the
+  // seed.
+
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;
-  virtual unsigned int uniform() const = 0;
 };
 
 // Rename above to RandomBitInterface?
@@ -43,11 +44,15 @@ class DeterministicRandInterface {
   // 
   // TODO: How about define the ByteVector type here?
 
-  void Init(const std::string& secret);  // secret per client
+  //void Init(const std::string& secret);  // secret per client
 
   // Seed with the DRBG state to the value, so you always get the same value,
   // but it's unpredictable without knowing the secret.
-  unsigned int RandomBits(const std::string value);  // state
+  //unsigned int RandomBits(const std::string value);  // state
+
+  virtual unsigned int f_bits() const = 0;
+  virtual unsigned int uniform() const = 0;
+  virtual void seed(const std::string& seed) = 0;  // mutates internal state
 };
 
 }  // namespace rappor

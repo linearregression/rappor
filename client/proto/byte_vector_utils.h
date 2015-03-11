@@ -5,14 +5,26 @@
 #ifndef COMPONENTS_RAPPOR_BYTE_VECTOR_UTILS_H_
 #define COMPONENTS_RAPPOR_BYTE_VECTOR_UTILS_H_
 
+#include <stdint.h>  // uint8_t
 #include <vector>
+#include <string>
+#include <cstddef>  // size_t in C++
 
+/*
 #include "base/basictypes.h"
 #include "base/macros.h"
 #include "components/rappor/rappor_parameters.h"
 #include "crypto/hmac.h"
+*/
 
 namespace rappor {
+
+// from rappor_parameters.h
+enum Probability {
+  PROBABILITY_75,    // 75%
+  PROBABILITY_50,    // 50%
+  PROBABILITY_25,    // 25%
+};
 
 // A vector of 8-bit integers used to store a set of binary bits.
 typedef std::vector<uint8_t> ByteVector;
@@ -59,7 +71,7 @@ class ByteVectorGenerator {
  private:
   size_t byte_count_;
 
-  DISALLOW_COPY_AND_ASSIGN(ByteVectorGenerator);
+  //DISALLOW_COPY_AND_ASSIGN(ByteVectorGenerator);
 };
 
 // A ByteVectorGenerator that uses a pseudo-random function to generate a

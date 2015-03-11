@@ -42,14 +42,13 @@ class IrrRandInterface {
   virtual unsigned int p_bits() const = 0;
   virtual unsigned int q_bits() const = 0;
  protected:
-  IrrRandInterface(float p, float q)
-      : p_(p), q_(q) {
+  IrrRandInterface(int num_bits, float p, float q)
+      : num_bits_(num_bits), p_(p), q_(q) {
   }
+  int num_bits_;
   float p_;
   float q_;
 };
-
-
 
 }  // namespace rappor
 

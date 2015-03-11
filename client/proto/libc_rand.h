@@ -16,6 +16,7 @@
 #define LIBC_RAND_H_
 
 #include "rappor_rand_interface.h"
+#include "rappor_deps.h"
 
 namespace rappor {
 
@@ -24,17 +25,14 @@ void LibcRandGlobalInit();
 
 // Interface that the encoder requires.  Applications should implement this
 // based on their own.
-class LibcRand : public RandInterface {
+class LibcRand : public IrrRandInterface {
  public:
   // TODO: rename these
   LibcRand(int num_bits, float p, float q)
-      : RandInterface(p, q),
-        num_bits_(num_bits) {
+      : IrrRandInterface(num_bits, p, q) {
   }
   virtual unsigned int p_bits() const;
   virtual unsigned int q_bits() const;
- private:
-  int num_bits_;
 };
 
 class LibcDeterministicRand : public DeterministicRandInterface {

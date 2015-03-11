@@ -28,7 +28,8 @@
 // Outputs should be the report set type?
 // - single protobuf?
 
-int main() {
+/*
+int main_old() {
   rappor::ReportList reports;
 
   rappor::Params p;
@@ -59,4 +60,39 @@ int main() {
   header->mutable_params()->CopyFrom(p);
 
   rappor::log("report list %s", reports.DebugString().c_str());
+}
+*/
+
+int main() {
+  rappor::ReportList reports;
+
+  rappor::Params p;
+  p.set_num_bits(8);
+  p.set_num_hashes(2);
+
+  rappor::LibcRandGlobalInit();  // seed
+  rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.75);
+
+  /*
+  int cohort = 9;
+  const char* metric_name = "home-page";
+  rappor::Encoder encoder(metric_name, cohort, p, &libc_d_rand, libc_rand);
+  assert(encoder.IsValid());  // bad instantiation
+
+  // TODO: loop over stdin
+  for (int i = 0; i < 5; ++i) {
+    std::string out;
+    encoder.Encode("foo", &out);
+    rappor::log("Output: %x", out.c_str());
+    reports.add_report(out);
+  }
+
+  rappor::ReportListHeader* header = reports.mutable_header();
+  // client params?
+  header->set_metric_name(metric_name);
+  header->set_cohort(cohort);
+  header->mutable_params()->CopyFrom(p);
+
+  rappor::log("report list %s", reports.DebugString().c_str());
+  */
 }

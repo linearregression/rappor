@@ -17,42 +17,32 @@
 
 #include <string>
 
-namespace rappor {
-
-// Interface that the encoder requires.  Applications should implement this
+// Interfaces that the encoder requires.  Applications should implement emhis
 // according to their own requirements.
-class RandInterface {
- public:
-  // NOTE: unsigned int for now.  Caller has to make sure it bits match
-  // the internal bloom filter size?
-  // 
-  // TODO: How about define the ByteVector type here?
+//
+// libc_rand.h provides insecure implementations.
 
-  // NOTE: These two need to be deterministic.  Maybe we can just provide the
-  // seed.
-
-  virtual unsigned int p_bits() const = 0;
-  virtual unsigned int q_bits() const = 0;
-};
-
-// Rename above to RandomBitInterface?
+// TODO: Real implementations
+// 
+// - DeterministicRandInterface is HMAC DRBG
+// - RandInterface could also be this, or it could be /dev/urandom
+namespace rappor {
 
 class DeterministicRandInterface {
  public:
   // NOTE: unsigned int for now.  Caller has to make sure it bits match
   // the internal bloom filter size?
-  // 
   // TODO: How about define the ByteVector type here?
-
-  //void Init(const std::string& secret);  // secret per client
-
-  // Seed with the DRBG state to the value, so you always get the same value,
-  // but it's unpredictable without knowing the secret.
-  //unsigned int RandomBits(const std::string value);  // state
 
   virtual unsigned int f_bits() const = 0;
   virtual unsigned int uniform() const = 0;
   virtual void seed(const std::string& seed) = 0;  // mutates internal state
+};
+
+class RandInterface {
+ public:
+  virtual unsigned int p_bits() const = 0;
+  virtual unsigned int q_bits() const = 0;
 };
 
 }  // namespace rappor

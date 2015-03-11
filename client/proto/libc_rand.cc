@@ -53,18 +53,6 @@ void LibcRandGlobalInit() {
   gInitialized = true;
 }
 
-unsigned int LibcRand::p_bits() const {
-  assert(gInitialized);
-  SeedWithTime();  // non-deterministic IRR
-  return randbits(p_, num_bits_);
-}
-
-unsigned int LibcRand::q_bits() const {
-  assert(gInitialized);
-  SeedWithTime();  // non-deterministic IRR
-  return randbits(q_, num_bits_);
-}
-
 //
 // LibcDeterministicRand
 //
@@ -90,6 +78,22 @@ void LibcDeterministicRand::seed(const std::string& seed) {
     h = (h << 5) + h + seed[i];
   }
   srand(h);
+}
+
+//
+// LibcRand
+//
+
+unsigned int LibcRand::p_bits() const {
+  assert(gInitialized);
+  SeedWithTime();  // non-deterministic IRR
+  return randbits(p_, num_bits_);
+}
+
+unsigned int LibcRand::q_bits() const {
+  assert(gInitialized);
+  SeedWithTime();  // non-deterministic IRR
+  return randbits(q_, num_bits_);
 }
 
 }  // namespace rappor

@@ -58,4 +58,18 @@ count() {
   wc -l hmac* byte_vector_utils*
 }
 
+test-hmac-sha256() {
+  #echo -n foo | sha256sum
+  python -c '
+import hashlib
+import hmac
+import sys
+
+secret = sys.argv[1]
+body = sys.argv[2]
+m = hmac.new(secret, body, digestmod=hashlib.sha256)
+print m.hexdigest()
+' "key" "value"
+}
+
 "$@"

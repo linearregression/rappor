@@ -7,15 +7,13 @@
 bool Hmac(const std::string& key, const std::string& value,
           unsigned char* output) {
   return HMAC(EVP_sha256(),
-
-              &key[0], key.size(),
-
+              key.c_str(), key.size(),
               // Why static_cast here?  Chrome hmac_opeenl.cc needs that too.
               // I gues we're going from signed to unsigned?
-              reinterpret_cast<const unsigned char*>(&value[0]), value.size(),
+              reinterpret_cast<const unsigned char*>(value.c_str()),
+              value.size(),
 
               output,
-              
               NULL);
 }
 
@@ -37,5 +35,9 @@ int main() {
   */
 
   bool result = Hmac(key, value, digest);
-  printf("result: %d", result);
+  printf("result: %d\n", result);
+  printf("digest: \n");
+  for (int i = 0; i < 32; ++i) {
+    printf("%x ", digest[i]);
+  }
 }

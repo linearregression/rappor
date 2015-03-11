@@ -17,7 +17,8 @@
 #include "rappor.pb.h"
 #include "rappor.h"
 #include "libc_rand.h"
-#include "rappor_deps.h"
+//#include "rappor_deps.h"
+#include "openssl_impl.h"
 
 // TODO: Should this take params as flags?
 //
@@ -66,16 +67,18 @@ int main_old() {
 int main() {
   rappor::ReportList reports;
 
-  rappor::Params p;
-  p.set_num_bits(8);
-  p.set_num_hashes(2);
+  rappor::Params params;
+  params.set_num_bits(8);
+  params.set_num_hashes(2);
 
   rappor::LibcRandGlobalInit();  // seed
-  rappor::LibcRand libc_rand(p.num_bits(), 0.50, 0.75);
+  rappor::LibcRand libc_rand(params.num_bits(), 0.50, 0.75);
 
   int cohort = 9;
   const char* metric_name = "home-page";
-  rappor::Encoder2 encoder(metric_name, cohort, p, &libc_d_rand, libc_rand);
+  rappor::Encoder2 encoder(
+      metric_name, cohort, params, rappor::Md5, rappor::Hmac, libc_rand);
+
   assert(encoder.IsValid());  // bad instantiation
   /*
 

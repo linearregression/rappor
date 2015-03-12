@@ -237,7 +237,7 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
 
   // Here we are relying on the fact that there are 4 uint64_t's in the
   // Sha256Digest.
-  uint64_t* pieces = reinterpret_cast<uint64_t*>(pieces);
+  uint64_t* pieces = reinterpret_cast<uint64_t*>(sha256);
 
   uint64_t uniform = pieces[0];  // 50% changes
   uint64_t f_bits = pieces[1];
@@ -268,12 +268,14 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   uint64_t prr = (f_bits & uniform) | (bloom & ~uniform);
   log("prr: %08x", prr);
 
-  /*
-
   // Do IRR.
 
-  ByteVector p_bits = rand_.p_bits();
-  ByteVector q_bits = rand_.q_bits();
+  ByteVector p_bits = irr_rand_.p_bits();
+  ByteVector q_bits = irr_rand_.q_bits();
+
+  // Make them too
+  p_bits &= 0xFF;  // one byte
+  q_bits &= 0xFF;  // one byte
 
   log("p_bits: %x", p_bits);
   log("q_bits: %x", q_bits);
@@ -292,7 +294,6 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
     output[i] = irr & 0xFF;  // last byte
     irr >>= 8;
   }
-  */
 }
 
 }  // namespace rappor

@@ -14,7 +14,7 @@ setup() {
 
 rappor-test() {
   make _tmp/rappor_test
-  _tmp/rappor_test
+  _tmp/rappor_test "$@"
 }
 
 hmac-drbg-test() {

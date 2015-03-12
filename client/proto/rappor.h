@@ -62,16 +62,24 @@ class Encoder2 {
   //   - this has cohorts, while AnalysisParams has num_cohorts
 
   Encoder2(
-      const std::string& metric_name, int cohort, const Params& params,
+      // not used
+      const std::string& metric_name, 
+
+      // turn it into md5 state
+      int cohort,
+
+      // num_hashes, num_bits are the ones being used
+      const Params& params,
+
       float prob_f, Md5Func* md5_func,  // bloom
+
       HmacFunc* hmac_func, const std::string& client_secret,  // PRR
+
       const IrrRandInterface& irr_rand);  // IRR
+
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
-  // something like StringPiece would be better here
-  // or const char*?
-  // output: shoudl be empty string
   bool Encode(const std::string& value, std::string* output) const;
 
  private:

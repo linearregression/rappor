@@ -1,4 +1,4 @@
-// Copyright 2014 Google Inc. All rights reserved.
+// Copyright 2015 Google Inc. All rights reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 // limitations under the License.
 
 #include <stdio.h>
-#include <stdlib.h>  // itoa
 #include <stdarg.h>  // va_list, etc.
 
 #include "rappor.h"
@@ -217,14 +216,10 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   output->assign(num_bytes_, '\0');
   for (int i = 0; i < num_bytes_; ++i) {
     log("i: %d", i);
-    //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte
-
     // "little endian" string
     (*output)[i] = irr & 0xFF;  // last byte
-    log("Assigned %02x", irr & 0xFF);
     irr >>= 8;
   }
-
   return true;
 }
 

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 #include <stdio.h>
+#include <stdlib.h>  // itoa
 #include <stdarg.h>  // va_list, etc.
 
 #include "rappor.h"
@@ -189,14 +190,20 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   // First do hashing.
 
   Md5Digest md5;
-  // OOPS: We have to take into account the cohort here
-  // Chrome has hash_seed_offset_ in BloomFilter class, set to (cohort *
+  // TODO: Instead of hashing the cohort every time, have a stateful thing in
+  // the constructor, and clone the state.  It's the MD5 context.
+  //
+  // Chrome has
+  // hash_seed_offset_ in BloomFilter class, set to (cohort *
   // num_hashes)
   // Can you just concatenate that number as a string?
   //
   // Another thing we could do is use hmac(secret) ?
 
-  md5_func_(value, md5);
+  char cohort[10];
+  sprintf(cohort, "%d", cohort_);
+  std::string cohort_str(cohort);
+  md5_func_(value + cohort_str, md5);
   PrintMd5(md5);
 
   int num_bits = params_.num_bits();

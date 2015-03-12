@@ -18,17 +18,9 @@
 #include "rappor.pb.h"
 #include "rappor.h"
 #include "libc_rand.h"
-//#include "rappor_deps.h"
 #include "openssl_impl.h"
 
-// TODO: Should this take params as flags?
-//
-// Then read strings from stdin
-// Assign them cohorts?
-// And then show outputs
-//
-// Outputs should be the report set type?
-// - single protobuf?
+// TODO: Params as flags?
 
 int main(int argc, char** argv) {
   if (argc != 2) {
@@ -48,12 +40,12 @@ int main(int argc, char** argv) {
   params.set_num_hashes(2);
 
   rappor::LibcRandGlobalInit();  // seed
-  rappor::LibcRand libc_rand(params.num_bits(), 0.50, 0.75);
+  rappor::LibcRand libc_rand(params.num_bits(), 0.50 /*p*/, 0.75 /*q*/);
 
   const char* client_secret = "secret";
 
   const char* metric_name = "home-page";
-  rappor::Encoder2 encoder(
+  rappor::Encoder encoder(
       metric_name, cohort, params,
       0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
       libc_rand);
@@ -62,16 +54,6 @@ int main(int argc, char** argv) {
 
   // maybe have rappor_encode and rappor_demo
   // demo shows how to encode multiple metrics
-
-  /*
-  for (int i = 0; i < 5; ++i) {
-    std::string out;
-    encoder.Encode("foo", &out);
-    rappor::log("Length: %x", out.size());
-    rappor::log("Output: %x", out.c_str());
-    reports.add_report(out);
-  }
-  */
 
   std::string line;
   while (true) {
@@ -82,7 +64,13 @@ int main(int argc, char** argv) {
     std::cout << "!" << line << std::endl;
 
     std::string out;
-    encoder.Encode(line, &out);
+    bool ok = encoder.Encode(line, &out);
+
+    // NOTE: Are there really encoding errors?
+    if (!ok) {
+      rappor::log("Error encoding string %s", line.c_str());
+      break;
+    }
     reports.add_report(out);
   }
 

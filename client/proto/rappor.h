@@ -22,7 +22,7 @@
 
 namespace rappor {
 
-class Encoder2 {
+class Encoder {
  public:
   // TODO:
   // - HmacFunc and Md5Func should be partially computed already
@@ -32,7 +32,7 @@ class Encoder2 {
   // - Params -> ClientParams?
   //   - this has cohorts, while AnalysisParams has num_cohorts
 
-  Encoder2(
+  Encoder(
       // not used
       const std::string& metric_name, 
 

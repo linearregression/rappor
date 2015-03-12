@@ -59,7 +59,7 @@ uint64_t Mask(int bloom_width) {
   }
 }
 
-Encoder2::Encoder2(
+Encoder::Encoder(
     const std::string& metric_name, int cohort, const Params& params,
     float prob_f,
     Md5Func* md5_func,
@@ -101,7 +101,7 @@ Encoder2::Encoder2(
   }
 }
 
-bool Encoder2::IsValid() const {
+bool Encoder::IsValid() const {
   return is_valid_;
 }
 
@@ -123,7 +123,7 @@ void PrintSha256(Sha256Digest h) {
   printf("\n");
 }
 
-bool Encoder2::Encode(const std::string& value, std::string* output) const {
+bool Encoder::Encode(const std::string& value, std::string* output) const {
   ByteVector bloom = 0;
 
   // First do hashing.
@@ -161,16 +161,14 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
 
   // Create HMAC(secret, value), and use its bits to construct f and uniform
   // bits.
-
   Sha256Digest sha256;
   hmac_func_(client_secret_, value, sha256);
 
   printf("sha256:\n");
   PrintSha256(sha256);
 
-  // sould this be a byte-chunk iterator?
-  // 1 to 7 byte strides out of 32 bytes?
-  // Or you could just have: uniform, and then 3 probabilities
+  // NOTE: This could be 1 to 7 byte strides out of 32 bytes to enable more
+  // probability resolution.
 
   // Here we are relying on the fact that there are 4 uint64_t's in the
   // Sha256Digest.
@@ -186,6 +184,7 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   } else if (prob_f_ == 0.75f) {
     f_bits |= pieces[2];
   } else {
+    // TODO: check it in the constructor
     printf("f should be 0.25, 0.5, or 0.75 -- got %f", prob_f_);
     assert(false);
   }
@@ -214,10 +213,7 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
 
   // Copy IRR into a string, which can go in a protobuf.
 
-  //output->reserve(num_bytes_);
-  // reserve space
   output->assign(num_bytes_, '\0');
-
   for (int i = 0; i < num_bytes_; ++i) {
     log("i: %d", i);
     //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte
@@ -227,6 +223,8 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
     log("Assigned %02x", irr & 0xFF);
     irr >>= 8;
   }
+
+  return true;
 }
 
 }  // namespace rappor

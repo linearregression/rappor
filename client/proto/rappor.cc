@@ -130,11 +130,13 @@ int HashPartWidth(int bloom_width) {
 
 Encoder2::Encoder2(
     const std::string& metric_name, int cohort, const Params& params,
+    float prob_f,
     Md5Func* md5_func,
     HmacFunc* hmac_func, const std::string& client_secret,
     const IrrRandInterface& irr_rand)
     : cohort_(cohort),
       params_(params),
+      prob_f_(prob_f),
       md5_func_(md5_func),
       hmac_func_(hmac_func),
       client_secret_(client_secret),
@@ -228,6 +230,30 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
 
   printf("sha256:\n");
   PrintSha256(sha256);
+
+  // sould this be a byte-chunk iterator?
+  // 1 to 7 byte strides out of 32 bytes?
+  // Or you could just have: uniform, and then 3 probabilities
+
+  uint64_t* pieces = reinterpret_cast<uint64_t*>(pieces);
+
+  uint64_t uniform = pieces[0];  // 50% changes
+  uint64_t f_bits = pieces[1];
+
+  if (prob_f_ == .5f) {
+    ;  // done
+  } else if (prob_f_ == 0.25f) {
+    f_bits &= pieces[2];
+  } else if (prob_f_ == 0.75f) {
+    f_bits |= pieces[2];
+  } else {
+    printf("f should be 0.25, 0.5, or 0.75 -- got %f", prob_f_);
+    assert(false);
+  }
+
+  // NOTE: Could change format string
+  printf("f_bits: %08x\n", f_bits);
+
 
   // uniform:
   //

@@ -63,7 +63,7 @@ class Encoder2 {
 
   Encoder2(
       const std::string& metric_name, int cohort, const Params& params,
-      Md5Func* md5_func,  // bloom
+      float prob_f, Md5Func* md5_func,  // bloom
       HmacFunc* hmac_func, const std::string& client_secret,  // PRR
       const IrrRandInterface& irr_rand);  // IRR
   // Check this immediately after instantiating.  We are not using exceptions.
@@ -77,6 +77,7 @@ class Encoder2 {
  private:
   int cohort_;
   const Params& params_;
+  float prob_f_;
   Md5Func* md5_func_;
   HmacFunc* hmac_func_;
   const std::string& client_secret_;

@@ -79,7 +79,8 @@ int main() {
   int cohort = 9;
   const char* metric_name = "home-page";
   rappor::Encoder2 encoder(
-      metric_name, cohort, params, rappor::Md5, rappor::Hmac, client_secret, 
+      metric_name, cohort, params,
+      0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
       libc_rand);
 
   assert(encoder.IsValid());  // bad instantiation

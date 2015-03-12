@@ -72,6 +72,16 @@ int main(int argc, char** argv) {
       break;
     }
     reports.add_report(out);
+
+    // print significant bit first
+    for (int i = out.size() - 1; i >= 0; --i) {
+      unsigned char byte = out[i];
+      for (int j = 7; j >= 0; --j) {
+        bool bit = byte & (1 << j);
+        std::cout << bit ? "1" : "0";
+      }
+    }
+    std::cout << "\n";
   }
 
   rappor::ReportListHeader* header = reports.mutable_header();

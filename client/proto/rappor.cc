@@ -235,6 +235,8 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   // 1 to 7 byte strides out of 32 bytes?
   // Or you could just have: uniform, and then 3 probabilities
 
+  // Here we are relying on the fact that there are 4 uint64_t's in the
+  // Sha256Digest.
   uint64_t* pieces = reinterpret_cast<uint64_t*>(pieces);
 
   uint64_t uniform = pieces[0];  // 50% changes
@@ -251,32 +253,20 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
     assert(false);
   }
 
+  // truncate to the right width
+  uniform %= num_bits;
+  f_bits %= num_bits;
+
   // NOTE: Could change format string
   printf("f_bits: %08x\n", f_bits);
-
-
-  // uniform:
-  //
-  // first num_bits bytes
-  //
-  // 32 bytes.
-  // Use rest of bytes to zero in on probability.
-
-  /*
-
-  // Seed it every time, for deterministic PRR.  This is equivalent to
-  // memoization, as described in the paper, and is memory-efficient.
-  det_rand_->seed(value);
-  ByteVector f_bits = det_rand_->f_bits();
-  log("f_bits: %x", f_bits);
-
-  ByteVector uniform = det_rand_->uniform();
-  log("uniform: %x", uniform);
   
   // first term: 1 with (1/2 + f/2) probability
   // second term: 0 with 1/2 probability, B with 1/2 probability
-  ByteVector prr = (f_bits & uniform) | (bloom & ~uniform);
-  log("prr: %x", uniform);
+  // NOTE: bloom is already 8 bits, while the others are 64 bits.
+  uint64_t prr = (f_bits & uniform) | (bloom & ~uniform);
+  log("prr: %08x", prr);
+
+  /*
 
   // Do IRR.
 

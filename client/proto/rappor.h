@@ -60,8 +60,9 @@ class Encoder2 {
 
   Encoder2(
       const std::string& metric_name, int cohort, const Params& params,
-      Md5Func* md5_func, HmacFunc* hmac_func,
-      const IrrRandInterface& irr_rand);
+      Md5Func* md5_func,  // bloom
+      HmacFunc* hmac_func, const std::string& client_secret,  // PRR
+      const IrrRandInterface& irr_rand);  // IRR
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
@@ -75,6 +76,7 @@ class Encoder2 {
   const Params& params_;
   Md5Func* md5_func_;
   HmacFunc* hmac_func_;
+  const std::string& client_secret_;
   const IrrRandInterface& irr_rand_;
   int num_bytes_;
   int hash_part_width_;  // log2(num_bits)

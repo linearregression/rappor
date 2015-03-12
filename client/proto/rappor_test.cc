@@ -74,10 +74,13 @@ int main() {
   rappor::LibcRandGlobalInit();  // seed
   rappor::LibcRand libc_rand(params.num_bits(), 0.50, 0.75);
 
+  const char* client_secret = "secret";
+
   int cohort = 9;
   const char* metric_name = "home-page";
   rappor::Encoder2 encoder(
-      metric_name, cohort, params, rappor::Md5, rappor::Hmac, libc_rand);
+      metric_name, cohort, params, rappor::Md5, rappor::Hmac, client_secret, 
+      libc_rand);
 
   assert(encoder.IsValid());  // bad instantiation
 

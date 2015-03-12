@@ -129,11 +129,14 @@ int HashPartWidth(int bloom_width) {
 
 Encoder2::Encoder2(
     const std::string& metric_name, int cohort, const Params& params,
-    Md5Func* md5_func, HmacFunc* hmac_func, const IrrRandInterface& irr_rand)
+    Md5Func* md5_func,
+    HmacFunc* hmac_func, const std::string& client_secret,
+    const IrrRandInterface& irr_rand)
     : cohort_(cohort),
       params_(params),
       md5_func_(md5_func),
       hmac_func_(hmac_func),
+      client_secret_(client_secret),
       irr_rand_(irr_rand),
       num_bytes_(0),
       is_valid_(true) {
@@ -171,6 +174,15 @@ void PrintMd5(Md5Digest md5) {
   printf("\n");
 }
 
+void PrintSha256(Sha256Digest h) {
+  // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
+  for (int i = 0; i < sizeof(Sha256Digest); ++i) {
+    //printf("[%d]\n", i);
+    printf("%02x", h[i]);
+  }
+  printf("\n");
+}
+
 bool Encoder2::Encode(const std::string& value, std::string* output) const {
   ByteVector bloom = 0;
 
@@ -191,9 +203,19 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
     bloom |= 1 << bit_to_set;
     log("Hash %d, set bit %d", i, bit_to_set);
   }
-  /*
 
   // Do PRR.
+
+  // Create HMAC(secret, value), and use its bits to construct f and uniform
+  // bits.
+
+  Sha256Digest sha256;
+  hmac_func_(client_secret_, value, sha256);
+
+  printf("sha256:\n");
+  PrintSha256(sha256);
+
+  /*
 
   // Seed it every time, for deterministic PRR.  This is equivalent to
   // memoization, as described in the paper, and is memory-efficient.

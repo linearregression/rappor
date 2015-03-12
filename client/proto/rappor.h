@@ -62,8 +62,8 @@ class Encoder2 {
   const std::string& client_secret_;
   const IrrRandInterface& irr_rand_;
   int num_bytes_;
-  int hash_part_width_;  // log2(num_bits)
   bool is_valid_;
+  uint64_t debug_mask_;
 };
 
 // For debug logging

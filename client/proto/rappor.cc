@@ -36,6 +36,8 @@ typedef uint64_t ByteVector;
 // bits).
 //
 // This function also validates that num_bits is a whole number of bytes.
+//
+// Don't need this now because we're doing it bytewise.
 
 int HashPartWidth(int bloom_width) {
   switch (bloom_width) {
@@ -43,8 +45,17 @@ int HashPartWidth(int bloom_width) {
     case 16:  return 4;
     case 32:  return 5;
     case 64:  return 6;
-    case 128: return 7;
     default:  return -1;  // ERROR
+  }
+}
+
+uint64_t Mask(int bloom_width) {
+  switch (bloom_width) {
+    case   8: return 0xFF;
+    case  16: return 0xFFFF;
+    case  32: return 0xFFFFFFFF;
+    case  64: return 0xFFFFFFFFFFFFFFFF;
+    default:  return 0;  // ERROR
   }
 }
 
@@ -64,7 +75,13 @@ Encoder2::Encoder2(
       num_bytes_(0),
       is_valid_(true) {
 
-  hash_part_width_ = HashPartWidth(params.num_bits());
+  debug_mask_ = Mask(params.num_bits());
+
+  if (debug_mask_ == 0) {
+    log("Invalid bloom filter size: %d", params.num_bits());
+  }
+  log("num_bits: %d", params.num_bits());
+  log("Mask: %016x", debug_mask_);
 
   // Validity constraints:
   //
@@ -173,14 +190,9 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
     assert(false);
   }
 
-  // truncate to the right width
-  // TODO: should be function of num_bits
-  uniform &= 0xFF;  // one byte
-  f_bits &= 0xFF;  // one byte
-
   // NOTE: Could change format string
-  log("f_bits: %08x", f_bits);
-  log("uniform: %08x", uniform);
+  log("f_bits: %08x", f_bits & debug_mask_);
+  log("uniform: %08x", uniform & debug_mask_);
   
   // first term: 1 with (1/2 + f/2) probability
   // second term: 0 with 1/2 probability, B with 1/2 probability
@@ -193,12 +205,8 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   ByteVector p_bits = irr_rand_.p_bits();
   ByteVector q_bits = irr_rand_.q_bits();
 
-  // Make them too
-  p_bits &= 0xFF;  // one byte
-  q_bits &= 0xFF;  // one byte
-
-  log("p_bits: %x", p_bits);
-  log("q_bits: %x", q_bits);
+  log("p_bits: %x", p_bits & debug_mask_);
+  log("q_bits: %x", q_bits & debug_mask_);
 
   ByteVector irr = (p_bits & ~prr) | (q_bits & prr);
 

@@ -54,7 +54,10 @@ class Encoder {
 class Encoder2 {
  public:
   // TODO:
-  // - Take HmacFunc, Md5Func, IrrInterface
+  // - HmacFunc and Md5Func should be partially computed already
+  //   - pass in objects that you can call update() on
+  //   - NaCl uses hashblocks.  Can you do that?
+  //   - clone state?
   // - Params -> ClientParams?
   //   - this has cohorts, while AnalysisParams has num_cohorts
 

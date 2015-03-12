@@ -73,9 +73,8 @@ Encoder2::Encoder2(
       client_secret_(client_secret),
       irr_rand_(irr_rand),
       num_bytes_(0),
-      is_valid_(true) {
-
-  debug_mask_ = Mask(params.num_bits());
+      is_valid_(true),
+      debug_mask_(Mask(params.num_bits())) {
 
   if (debug_mask_ == 0) {
     log("Invalid bloom filter size: %d", params.num_bits());
@@ -198,7 +197,7 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   // second term: 0 with 1/2 probability, B with 1/2 probability
   // NOTE: bloom is already 8 bits, while the others are 64 bits.
   uint64_t prr = (f_bits & uniform) | (bloom & ~uniform);
-  log("prr: %08x", prr);
+  log("prr: %08x", prr & debug_mask_);
 
   // Do IRR.
 
@@ -215,11 +214,14 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   // Copy IRR into a string, which can go in a protobuf.
 
   output->reserve(num_bytes_);
+
   for (int i = 0; i < num_bytes_; ++i) {
+    log("i: %d", i);
     //output[num_bytes_ - 1 - i] = bytes & 0xFF;  // last byte
 
     // "little endian" string
-    output[i] = irr & 0xFF;  // last byte
+    *output += irr & 0xFF;  // last byte
+    log("Assigned %02x", irr & 0xFF);
     irr >>= 8;
   }
 }

@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
   rappor::ReportList reports;
 
   rappor::Params params;
-  params.set_num_bits(8);
+  params.set_num_bits(16);
   params.set_num_hashes(2);
 
   rappor::LibcRandGlobalInit();  // seed
@@ -68,6 +68,7 @@ int main(int argc, char** argv) {
   for (int i = 0; i < 5; ++i) {
     std::string out;
     encoder.Encode("foo", &out);
+    rappor::log("Length: %x", out.size());
     rappor::log("Output: %x", out.c_str());
     reports.add_report(out);
   }

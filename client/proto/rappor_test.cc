@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 
   const char* metric_name = "home-page";
   rappor::Encoder encoder(
-      metric_name, cohort, params,
+      cohort, params,
       0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
       libc_rand);
 

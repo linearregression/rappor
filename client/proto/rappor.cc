@@ -60,7 +60,7 @@ uint64_t Mask(int bloom_width) {
 }
 
 Encoder::Encoder(
-    const std::string& metric_name, int cohort, const Params& params,
+    int cohort, const Params& params,
     float prob_f,
     Md5Func* md5_func,
     HmacFunc* hmac_func, const std::string& client_secret,
@@ -72,16 +72,10 @@ Encoder::Encoder(
       hmac_func_(hmac_func),
       client_secret_(client_secret),
       irr_rand_(irr_rand),
+
       num_bytes_(0),
       is_valid_(true),
       debug_mask_(Mask(params.num_bits())) {
-
-  if (debug_mask_ == 0) {
-    log("Invalid bloom filter size: %d", params.num_bits());
-    is_valid_ = false;
-  }
-  log("num_bits: %d", params.num_bits());
-  log("Mask: %016x", debug_mask_);
 
   // Validity constraints:
   //
@@ -91,6 +85,13 @@ Encoder::Encoder(
   //   128 > ( num_hashes * log2(num_bits) )
   // sha256 is long enough:
   //   256 > num_bits + (prob_f resolution * num_bits)
+
+  if (debug_mask_ == 0) {
+    log("Invalid bloom filter size: %d", params.num_bits());
+    is_valid_ = false;
+  }
+  log("num_bits: %d", params.num_bits());
+  log("Mask: %016x", debug_mask_);
 
   // number of bytes in bloom filter
   if (params_.num_bits() % 8 == 0) {

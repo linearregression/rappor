@@ -33,9 +33,6 @@ class Encoder {
   //   - this has cohorts, while AnalysisParams has num_cohorts
 
   Encoder(
-      // not used
-      const std::string& metric_name, 
-
       // turn it into md5 state
       int cohort,
 

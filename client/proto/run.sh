@@ -17,6 +17,14 @@ rappor-test() {
   _tmp/rappor_test "$@"
 }
 
+rappor-encode() {
+  seq 10 | rappor-test 5 
+}
+
+empty-input() {
+  echo -n '' | rappor-test 5 
+}
+
 hmac-drbg-test() {
   make _tmp/hmac_drbg_test
   _tmp/hmac_drbg_test

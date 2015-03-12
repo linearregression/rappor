@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <iostream>
 #include <stdio.h>
 
 #include "rappor.pb.h"
@@ -65,11 +66,26 @@ int main(int argc, char** argv) {
   // maybe have rappor_encode and rappor_demo
   //   demo shows how to encode multiple metrics
 
+  /*
   for (int i = 0; i < 5; ++i) {
     std::string out;
     encoder.Encode("foo", &out);
     rappor::log("Length: %x", out.size());
     rappor::log("Output: %x", out.c_str());
+    reports.add_report(out);
+  }
+  */
+
+  std::string line;
+  while (true) {
+    std::getline(std::cin, line);  // no trailing newline
+    if (line.empty()) {
+      break;
+    }
+    std::cout << "!" << line << std::endl;
+
+    std::string out;
+    encoder.Encode(line, &out);
     reports.add_report(out);
   }
 

@@ -27,9 +27,14 @@ void log(const char* fmt, ...) {
   printf("\n");
 }
 
-//typedef std::vector<uint8_t> ByteVector;
-// We don't need more than 8 bytes for now
-typedef uint64_t ByteVector; 
+// TODO:
+// - Put this in the header
+// - Encode() should return it
+//   - Then print it (with a mask)
+// - typedef unsigned int Bits
+//   - rappor::Bits type is used for Bloom Filter, PRR, and IRR
+
+typedef unsigned long Bits; 
 
 // The number of bits for one hash function is log2(number of bloom filter
 // bits).
@@ -58,6 +63,8 @@ uint64_t Mask(int bloom_width) {
   }
 }
 
+static int kMaxBits = sizeof(Bits) * 8;
+
 Encoder::Encoder(
     int cohort, const Params& params,
     float prob_f,
@@ -79,7 +86,7 @@ Encoder::Encoder(
   // Validity constraints:
   //
   // bits fit in an integral type uint64_t:
-  //   num_bits < 64 (or sizeof(ByteVector) * 8)
+  //   num_bits < 64 (or sizeof(Bits) * 8)
   // md5 is long enough:
   //   128 > ( num_hashes * log2(num_bits) )
   // sha256 is long enough:
@@ -89,7 +96,14 @@ Encoder::Encoder(
     log("Invalid bloom filter size: %d", params.num_bits());
     is_valid_ = false;
   }
+
   log("num_bits: %d", params.num_bits());
+  if (params.num_bits() > kMaxBits) {
+    log("num_bits (%d) can't be bigger than rappor::Bits type: (%d)",
+        params.num_bits(), kMaxBits);
+    is_valid_ = false;
+  }
+
   log("Mask: %016x", debug_mask_);
 
   // number of bytes in bloom filter
@@ -124,7 +138,7 @@ void PrintSha256(Sha256Digest h) {
 }
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
-  ByteVector bloom = 0;
+  Bits bloom = 0;
 
   // First do hashing.
 
@@ -201,13 +215,13 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
 
   // Do IRR.
 
-  ByteVector p_bits = irr_rand_.p_bits();
-  ByteVector q_bits = irr_rand_.q_bits();
+  Bits p_bits = irr_rand_.p_bits();
+  Bits q_bits = irr_rand_.q_bits();
 
   log("p_bits: %x", p_bits & debug_mask_);
   log("q_bits: %x", q_bits & debug_mask_);
 
-  ByteVector irr = (p_bits & ~prr) | (q_bits & prr);
+  Bits irr = (p_bits & ~prr) | (q_bits & prr);
 
   log("irr: %x", irr);
 

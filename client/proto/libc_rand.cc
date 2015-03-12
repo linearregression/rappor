@@ -34,22 +34,11 @@ uint64_t randbits(float p1, int num_bits) {
 
 static bool gInitialized = false;
 
-
-static void SeedWithTime() {
-  // This only has second resolution, and isn't good enough.
-  //int seed = time(NULL);
-
-  timespec ts;
-  // clock_gettime(CLOCK_MONOTONIC, &ts); // Works on FreeBSD
-  clock_gettime(CLOCK_REALTIME, &ts); // Works on Linux
-
-  srand(ts.tv_nsec);  // seed with nanoseconds
-}
-
 namespace rappor {
 
 void LibcRandGlobalInit() {
-  SeedWithTime();
+  int seed = time(NULL);
+  srand(seed);  // seed with nanoseconds
   gInitialized = true;
 }
 
@@ -59,13 +48,11 @@ void LibcRandGlobalInit() {
 
 unsigned int LibcRand::p_bits() const {
   assert(gInitialized);
-  SeedWithTime();  // non-deterministic IRR
   return randbits(p_, num_bits_);
 }
 
 unsigned int LibcRand::q_bits() const {
   assert(gInitialized);
-  SeedWithTime();  // non-deterministic IRR
   return randbits(q_, num_bits_);
 }
 

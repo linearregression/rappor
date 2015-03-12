@@ -14,8 +14,7 @@ _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
     -o _tmp/rappor_test \
     _tmp/rappor.pb.cc rappor.cc libc_rand.cc openssl_impl.cc rappor_test.cc \
     -lprotobuf \
-    -lcrypto \
-    -lrt
+    -lcrypto
 
 _tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
 	$(CXX) \

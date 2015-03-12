@@ -76,7 +76,7 @@ int main() {
 
   const char* client_secret = "secret";
 
-  int cohort = 9;
+  int cohort = 7;
   const char* metric_name = "home-page";
   rappor::Encoder2 encoder(
       metric_name, cohort, params,

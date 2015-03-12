@@ -254,11 +254,13 @@ bool Encoder2::Encode(const std::string& value, std::string* output) const {
   }
 
   // truncate to the right width
-  uniform %= num_bits;
-  f_bits %= num_bits;
+  // TODO: should be function of num_bits
+  uniform &= 0xFF;  // one byte
+  f_bits &= 0xFF;  // one byte
 
   // NOTE: Could change format string
-  printf("f_bits: %08x\n", f_bits);
+  log("f_bits: %08x", f_bits);
+  log("uniform: %08x", uniform);
   
   // first term: 1 with (1/2 + f/2) probability
   // second term: 0 with 1/2 probability, B with 1/2 probability

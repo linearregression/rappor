@@ -54,33 +54,6 @@ void LibcRandGlobalInit() {
 }
 
 //
-// LibcDeterministicRand
-//
-
-unsigned int LibcDeterministicRand::f_bits() const {
-  assert(gInitialized);
-  return randbits(f_, num_bits_);
-}
-
-unsigned int LibcDeterministicRand::uniform() const {
-  assert(gInitialized);
-  return randbits(0.5, num_bits_);
-}
-
-// NOTE: The libc RNG is global, so we are mutating the LibcRand state too!
-// This probably isn't good, but this is insecure anyway.
-void LibcDeterministicRand::seed(const std::string& seed) {
-  assert(gInitialized);
-
-  // hash the seed string into an integer, then pass to libc.
-  int h = 5381;
-  for (int i = 0; i < seed.size(); ++i) {
-    h = (h << 5) + h + seed[i];
-  }
-  srand(h);
-}
-
-//
 // LibcRand
 //
 

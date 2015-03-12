@@ -15,7 +15,6 @@
 #ifndef LIBC_RAND_H_
 #define LIBC_RAND_H_
 
-#include "rappor_rand_interface.h"
 #include "rappor_deps.h"
 
 namespace rappor {
@@ -33,19 +32,6 @@ class LibcRand : public IrrRandInterface {
   }
   virtual unsigned int p_bits() const;
   virtual unsigned int q_bits() const;
-};
-
-class LibcDeterministicRand : public DeterministicRandInterface {
- public:
-  LibcDeterministicRand(int num_bits, float f)
-      : num_bits_(num_bits), f_(f) {
-  }
-  virtual unsigned int f_bits() const;
-  virtual unsigned int uniform() const;
-  virtual void seed(const std::string& seed);  // mutates internal state
- private:
-  int num_bits_;
-  float f_;
 };
 
 }  // namespace rappor

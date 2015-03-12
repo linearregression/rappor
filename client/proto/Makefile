@@ -3,7 +3,7 @@ _tmp/rappor.pb.h: rappor.proto
 
 # TODO: Instead of listing header files here, use gcc -M and Make features.
 _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
-                  rappor_rand_interface.h libc_rand.cc libc_rand.h \
+                  rappor_deps.h libc_rand.cc libc_rand.h \
 									openssl_impl.cc rappor_test.cc 
 # NOTES:
 # -lprotobuf comes after source files

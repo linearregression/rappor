@@ -61,6 +61,11 @@ int main(int argc, char** argv) {
   assert(encoder.IsValid());  // bad instantiation
 
   // TODO: loop over stdin
+  // print to stdout
+  // flag to print ReportList?
+  // maybe have rappor_encode and rappor_demo
+  //   demo shows how to encode multiple metrics
+
   for (int i = 0; i < 5; ++i) {
     std::string out;
     encoder.Encode("foo", &out);

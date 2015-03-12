@@ -18,38 +18,9 @@
 #include <string>
 
 #include "rappor.pb.h"
-#include "rappor_rand_interface.h"
 #include "rappor_deps.h"  // for dependency injection
 
 namespace rappor {
-
-class Encoder {
- public:
-  // TODO:
-  // - Take HmacFunc, Md5Func, IrrInterface
-  // - Params -> ClientParams?
-  //   - this has cohorts, while AnalysisParams has num_cohorts
-
-  Encoder(
-      const std::string& metric_name, int cohort, const Params& params,
-      DeterministicRandInterface* det_rand,
-      const RandInterface& rand);
-  // Check this immediately after instantiating.  We are not using exceptions.
-  bool IsValid() const;
-
-  // something like StringPiece would be better here
-  // or const char*?
-  // output: shoudl be empty string
-  bool Encode(const std::string& value, std::string* output) const;
-
- private:
-  int cohort_;
-  const Params& params_;
-  DeterministicRandInterface* det_rand_;
-  const RandInterface& rand_;
-  int num_bytes_;
-  bool is_valid_;
-};
 
 class Encoder2 {
  public:

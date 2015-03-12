@@ -16,11 +16,6 @@ _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
     -lprotobuf \
     -lcrypto
 
-_tmp/hmac_drbg_test: byte_vector_utils.cc byte_vector_utils.h
-	$(CXX) \
-    -o _tmp/hmac_drbg_test \
-    byte_vector_utils.cc hmac_openssl.cc
-
 # c++0x for std::array
 		#-std=c++0x 
 _tmp/hmac_openssl_test: hmac_openssl_test.cc openssl_impl.cc

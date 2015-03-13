@@ -35,9 +35,11 @@ int main(int argc, char** argv) {
 
   rappor::ReportList reports;
 
+  int num_bits = 16;
+  int num_hashes = 2;
   rappor::Params params;
-  params.set_num_bits(16);
-  params.set_num_hashes(2);
+  params.set_num_bits(num_bits);
+  params.set_num_hashes(num_hashes);
 
   rappor::LibcRandGlobalInit();  // seed
   rappor::LibcRand libc_rand(params.num_bits(), 0.50 /*p*/, 0.75 /*q*/);
@@ -46,7 +48,7 @@ int main(int argc, char** argv) {
 
   const char* metric_name = "home-page";
   rappor::Encoder encoder(
-      cohort, params,
+      cohort, num_bits, num_hashes,
       0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
       libc_rand);
 

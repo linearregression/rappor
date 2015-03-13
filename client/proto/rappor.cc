@@ -66,13 +66,14 @@ uint64_t Mask(int bloom_width) {
 static int kMaxBits = sizeof(Bits) * 8;
 
 Encoder::Encoder(
-    int cohort, const Params& params,
+    int cohort, int num_bits, int num_hashes,
     float prob_f,
     Md5Func* md5_func,
     HmacFunc* hmac_func, const std::string& client_secret,
     const IrrRandInterface& irr_rand)
     : cohort_(cohort),
-      params_(params),
+      num_bits_(num_bits),
+      num_hashes_(num_hashes),
       prob_f_(prob_f),
       md5_func_(md5_func),
       hmac_func_(hmac_func),
@@ -81,7 +82,7 @@ Encoder::Encoder(
 
       num_bytes_(0),
       is_valid_(true),
-      debug_mask_(Mask(params.num_bits())) {
+      debug_mask_(Mask(num_bits)) {
 
   // Validity constraints:
   //
@@ -93,22 +94,22 @@ Encoder::Encoder(
   //   256 > num_bits + (prob_f resolution * num_bits)
 
   if (debug_mask_ == 0) {
-    log("Invalid bloom filter size: %d", params.num_bits());
+    log("Invalid bloom filter size: %d", num_bits_);
     is_valid_ = false;
   }
 
-  log("num_bits: %d", params.num_bits());
-  if (params.num_bits() > kMaxBits) {
+  log("num_bits: %d", num_bits_);
+  if (num_bits_ > kMaxBits) {
     log("num_bits (%d) can't be bigger than rappor::Bits type: (%d)",
-        params.num_bits(), kMaxBits);
+        num_bits_, kMaxBits);
     is_valid_ = false;
   }
 
   log("Mask: %016x", debug_mask_);
 
   // number of bytes in bloom filter
-  if (params_.num_bits() % 8 == 0) {
-    num_bytes_ = params_.num_bits() / 8;
+  if (num_bits_ % 8 == 0) {
+    num_bytes_ = num_bits_ / 8;
     log("num bytes: %d", num_bytes_);
   } else {
     is_valid_ = false;
@@ -159,14 +160,12 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   md5_func_(value + cohort_str, md5);
   PrintMd5(md5);
 
-  int num_bits = params_.num_bits();
-
   // We don't need the full precision
   // Another option: use each byte.  3-7 bits each is fine.
 
-  for (int i = 0; i < params_.num_hashes(); ++i) {
+  for (int i = 0; i < num_hashes_; ++i) {
     // 1 byte per hash for now
-    int bit_to_set = md5[i] % num_bits;
+    int bit_to_set = md5[i] % num_bits_;
     bloom |= 1 << bit_to_set;
     log("Hash %d, set bit %d", i, bit_to_set);
   }

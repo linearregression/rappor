@@ -37,7 +37,7 @@ class Encoder {
       int cohort,
 
       // num_hashes, num_bits are the ones being used
-      const Params& params,
+      int num_bits, int num_hashes,
 
       float prob_f, Md5Func* md5_func,  // bloom
 
@@ -51,9 +51,10 @@ class Encoder {
   bool Encode(const std::string& value, std::string* output) const;
 
  private:
-  int cohort_;
-  const Params& params_;
-  float prob_f_;
+  const int cohort_;
+  const int num_bits_;
+  const int num_hashes_;
+  const float prob_f_;
   Md5Func* md5_func_;
   HmacFunc* hmac_func_;
   const std::string& client_secret_;

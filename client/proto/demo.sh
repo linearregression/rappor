@@ -44,34 +44,46 @@ candidates() {
     $RAPPOR_SRC/_tmp/${dist}_candidates.txt
 }
 
+readonly NUM_COHORTS=64
+
 histogram() {
   python -c '
 import collections
 import csv
 import sys
 
+num_cohorts = int(sys.argv[1])  # multiply counts by this number
+
 counter = collections.Counter()
-with open(sys.argv[1]) as in_file:
+with open(sys.argv[2]) as in_file:
   for line in in_file:
     counter[line.strip()] += 1
 
-with open(sys.argv[2], "w") as out_file:
+with open(sys.argv[3], "w") as out_file:
   c = csv.writer(out_file)
   c.writerow(("string", "count"))
   for value, count in counter.iteritems():
-    c.writerow((value, str(count)))
-' $RAPPOR_SRC/_tmp/cpp.txt $RAPPOR_SRC/_tmp/cpp_hist.csv
+    c.writerow((value, str(count * num_cohorts)))
+' 64 $RAPPOR_SRC/_tmp/cpp.txt $RAPPOR_SRC/_tmp/cpp_hist.csv
 }
 
 # We are currently using 64 cohorts
 encode-all() {
-  for cohort in $(seq 10); do
+  for cohort in $(seq $NUM_COHORTS); do
     echo "Cohort $cohort"
     encode-cohort $cohort
   done
   local out=$RAPPOR_SRC/_tmp/cpp_out.csv
   { echo 'client,cohort,rappor'; cat _tmp/cohort_*.csv; } > $out
   wc -l $out
+}
+
+# Params from rappor_test
+params() {
+  cat >$RAPPOR_SRC/_tmp/cpp_params.csv <<EOF
+k,h,m,p,q,f
+16,2,64,0.5,0.75,0.5
+EOF
 }
 
 # TODO: Port this

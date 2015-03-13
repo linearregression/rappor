@@ -69,7 +69,8 @@ with open(sys.argv[3], "w") as out_file:
 
 # We are currently using 64 cohorts
 encode-all() {
-  for cohort in $(seq $NUM_COHORTS); do
+  local max=$(expr $NUM_COHORTS - 1)
+  for cohort in $(seq 0 $max); do
     echo "Cohort $cohort"
     encode-cohort $cohort
   done
@@ -85,12 +86,6 @@ k,h,m,p,q,f
 16,2,64,0.5,0.75,0.5
 EOF
 }
-
-# TODO: Port this
-#
-# I think you have to cd
-#
-# And then generate a dist like "exp_cpp_"
 
 run-cpp() {
   cd $RAPPOR_SRC

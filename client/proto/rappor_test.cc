@@ -28,10 +28,13 @@ int main(int argc, char** argv) {
     exit(1);
   }
   int cohort = atoi(argv[1]);
+  // atoi is lame, can't distinguish 0 from error!
+  /*
   if (cohort == 0) {
     rappor::log("Cohort must be an integer greater than 0.");
     exit(1);
   }
+  */
 
   rappor::ReportList reports;
 

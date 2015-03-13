@@ -29,10 +29,14 @@ encode-cohort() {
     > _tmp/cohort_$cohort.csv
 }
 
+# We are currently using 64 cohorts
 encode-all() {
   for cohort in $(seq 10); do
-    time encode-cohort $cohort
+    echo "Cohort $cohort"
+    encode-cohort $cohort
   done
+  { echo 'client,cohort,rappor'; cat _tmp/cohort_*.csv; } > _tmp/exp_out.csv
+  wc -l _tmp/exp_out.csv
 }
 
 "$@"

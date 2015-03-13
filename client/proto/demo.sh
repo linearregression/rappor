@@ -32,11 +32,16 @@ encode-cohort() {
 }
 
 true-inputs() {
-  cat _tmp/exp.txt | sort | uniq > $RAPPOR_SRC/_tmp/exp_true_inputs.txt
+  local dist=cpp
+  cat $RAPPOR_SRC/_tmp/${dist}.txt | sort | uniq \
+    > $RAPPOR_SRC/_tmp/${dist}_true_inputs.txt
 }
 
 candidates() {
-  cp _tmp/exp_true_inputs.txt $RAPPOR_SRC/_tmp/exp_candidates.txt
+  local dist=cpp
+  cp \
+    $RAPPOR_SRC/_tmp/${dist}_true_inputs.txt \
+    $RAPPOR_SRC/_tmp/${dist}_candidates.txt
 }
 
 histogram() {
@@ -69,10 +74,6 @@ encode-all() {
   wc -l $out
 }
 
-root-demo() {
-  ../../demo.sh "$@"
-}
-
 # TODO: Port this
 #
 # I think you have to cd
@@ -82,18 +83,20 @@ root-demo() {
 run-cpp() {
   cd $RAPPOR_SRC
 
-  banner "Hashing Candidates ($dist)"
-  hash-candidates $dist
+  local dist=cpp  # fake one
 
-  banner "Summing bits ($dist)"
-  sum-bits $dist
+  echo "Hashing Candidates ($dist)"
+  ./demo.sh hash-candidates $dist
+
+  echo "Summing bits ($dist)"
+  ./demo.sh sum-bits $dist
 
   # TODO:
   # guess-candidates  # cheat and get them from the true input
   # hash-candidates  # create map file
 
-  banner "Analyzing RAPPOR output ($dist)"
-  analyze $dist "Distribution Comparison ($dist)"
+  echo "Analyzing RAPPOR output ($dist)"
+  ./demo.sh analyze $dist "Distribution Comparison ($dist)"
 }
 
 

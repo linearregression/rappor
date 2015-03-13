@@ -63,8 +63,6 @@ int main(int argc, char** argv) {
     if (line.empty()) {
       break;
     }
-    std::cout << "!" << line << std::endl;
-
     std::string out;
     bool ok = encoder.Encode(line, &out);
 

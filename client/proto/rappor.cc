@@ -124,18 +124,18 @@ void PrintMd5(Md5Digest md5) {
   // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
   for (int i = 0; i < sizeof(Md5Digest); ++i) {
     //printf("[%d]\n", i);
-    printf("%02x", md5[i]);
+    fprintf(stderr, "%02x", md5[i]);
   }
-  printf("\n");
+  fprintf(stderr, "\n");
 }
 
 void PrintSha256(Sha256Digest h) {
   // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
   for (int i = 0; i < sizeof(Sha256Digest); ++i) {
     //printf("[%d]\n", i);
-    printf("%02x", h[i]);
+    fprintf(stderr, "%02x", h[i]);
   }
-  printf("\n");
+  fprintf(stderr, "\n");
 }
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
@@ -177,7 +177,7 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   Sha256Digest sha256;
   hmac_func_(client_secret_, value, sha256);
 
-  printf("sha256:\n");
+  log("sha256:\n");
   PrintSha256(sha256);
 
   // NOTE: This could be 1 to 7 byte strides out of 32 bytes to enable more

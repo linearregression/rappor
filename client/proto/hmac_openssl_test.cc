@@ -26,4 +26,19 @@ int main() {
     printf("%02x", md5[i]);
   }
   printf("\n");
+
+  // how long are secrets?  Probably should be reasonably long
+  // ~300 ms for 1M.
+  // So then that's 300 ns.  Fast.
+  //for (int i = 0; i < 1000000; ++i) {
+  //  bool ok = rappor::Md5("01234567890123456789", md5);
+  //}
+
+  // 3 seconds for this.  So that's 3 us per HMAC value.
+  //
+  // For simulation, you can just use 1 byte secrets, so I guess simulation
+  // speed isn't really an issue.
+  for (int i = 0; i < 1000000; ++i) {
+    bool ok = rappor::Hmac("01234567890123456789", "foo", sha256);
+  }
 }

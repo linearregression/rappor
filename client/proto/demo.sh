@@ -89,7 +89,6 @@ EOF
 
 run-cpp() {
   cd $RAPPOR_SRC
-
   local dist=cpp  # fake one
 
   echo "Hashing Candidates ($dist)"
@@ -104,7 +103,16 @@ run-cpp() {
 
   echo "Analyzing RAPPOR output ($dist)"
   ./demo.sh analyze $dist "Distribution Comparison ($dist)"
+
 }
 
+# FAILING
+analyze() {
+  cd $RAPPOR_SRC
+  local dist=cpp  # fake one
+
+  echo "Analyzing RAPPOR output ($dist)"
+  time ./demo.sh analyze $dist "Distribution Comparison ($dist)" || true
+}
 
 "$@"

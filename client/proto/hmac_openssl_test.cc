@@ -38,7 +38,15 @@ int main() {
   //
   // For simulation, you can just use 1 byte secrets, so I guess simulation
   // speed isn't really an issue.
+
+  std::string key2("01234567890123456789");
+  // It's not that much faster with this small key -- 2.8 seconds.
+  //std::string key2("0");
+
+  std::string value2("01234567890123456789");
+  //std::string value2("0");
+
   for (int i = 0; i < 1000000; ++i) {
-    bool ok = rappor::Hmac("01234567890123456789", "foo", sha256);
+    bool ok = rappor::Hmac(key2, value2, sha256);
   }
 }

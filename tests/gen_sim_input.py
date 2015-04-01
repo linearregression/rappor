@@ -226,6 +226,10 @@ def main(argv):
         if i % 10000 == 0:
           elapsed = time.time() - start_time
           log('Generated %d rows in %.2f seconds', i, elapsed)
+
+        true_value = 'v%d' % rand_sample()
+        print >>f, true_value
+
     else:  # csv mode
       c = csv.writer(f)
       c.writerow(('client', 'true_value'))

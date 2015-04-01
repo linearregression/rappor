@@ -49,6 +49,7 @@ NUM_UNIQUE_VALUES = 100         # Range of client's values in reports
                                 # The default is strings "1" ... "100"
 DIST_PARAM = None               # Parameter to pass to distribution
 NUM_CLIENTS = 100000            # Number of simulated clients
+VALUES_PER_CLIENT = 1
 
 
 # NOTE: unused.  This is hard-coded now.
@@ -71,9 +72,7 @@ def usage(script_name):
   -o        CSV output path (required).  Header is client, value.
   -l        Output a value on each line, without a client
   -r        number of unique values to generate (default 100)
-  -u        Uniform distribution (default)
-  -g        Gaussian distribution
-  -e        Exponential distribution
+  -d        Distribution (exp, gauss, or unif)
   -n        Number of users (default = 100,000)
   -p        Parameter
             Ignored for uniform
@@ -90,7 +89,7 @@ def init_rand_precompute():
 
 
 def rand_sample_unif():
-  return random.randrange(1, NUM_UNIQUE_VALUES)
+  return random.randrange(1, NUM_UNIQUE_VALUES + 1)
 
 
 def rand_sample_gauss():
@@ -150,11 +149,12 @@ def WriteParamsHtml(num_values, f):
 
 def main(argv):
   # All command line arguments are placed into global vars
-  global OUTFILE, NUM_LINES, NUM_UNIQUE_VALUES, DISTR, DIST_PARAM, NUM_CLIENTS
+  global OUTFILE, NUM_LINES, NUM_UNIQUE_VALUES, DISTR, DIST_PARAM, \
+      NUM_CLIENTS, VALUES_PER_CLIENT
 
   # Get arguments
   try:
-    opts, args = getopt.getopt(argv[1:], "ugen:p:o:r:l:")
+    opts, args = getopt.getopt(argv[1:], "d:n:p:o:r:c:l:")
   except getopt.GetoptError:
     usage(argv[0])
     sys.exit(2)
@@ -167,16 +167,17 @@ def main(argv):
       NUM_LINES = int(arg)
     elif opt == "-r":
       NUM_UNIQUE_VALUES = int(arg)
-    elif opt == "-u":
-      DISTR = DISTR_UNIF
-    elif opt == "-g":
-      DISTR = DISTR_GAUSS
-    elif opt == "-e":
-      DISTR = DISTR_EXP
+    elif opt == "-d":
+      d = {'exp': DISTR_EXP, 'gauss': DISTR_GAUSS, 'unif': DISTR_UNIF}
+      DISTR = d.get(arg)
+      if not DISTR:
+        raise RuntimeError('Invalid distribution %r' % arg)
     elif opt == "-p":
       DIST_PARAM = float(arg)
     elif opt == "-n":
       NUM_CLIENTS = int(arg)
+    elif opt == "-c":
+      VALUES_PER_CLIENT = int(arg)
 
   # NOTE: Output file is required now (instead of using stdout) because it's
   # also used to write sim params.
@@ -218,7 +219,6 @@ def main(argv):
   start_time = time.time()
 
   # Printing values into file OUTFILE
-  VALUES_PER_CLIENT = 7
   with open(OUTFILE, "w") as f:
     if NUM_LINES:
       # In this mode we're not outputting the client
@@ -226,10 +226,6 @@ def main(argv):
         if i % 10000 == 0:
           elapsed = time.time() - start_time
           log('Generated %d rows in %.2f seconds', i, elapsed)
-
-        true_value = 'v%d' % rand_sample()
-        print >>f, true_value
-
     else:  # csv mode
       c = csv.writer(f)
       c.writerow(('client', 'true_value'))
@@ -238,7 +234,7 @@ def main(argv):
           elapsed = time.time() - start_time
           log('Generated %d rows in %.2f seconds', i, elapsed)
 
-        for _ in xrange(7):  # A fixed number of values per user
+        for _ in xrange(VALUES_PER_CLIENT):  # A fixed number of values per user
           true_value = 'v%d' % rand_sample()
           c.writerow((i, true_value))
   log('Wrote %s', OUTFILE)
@@ -253,4 +249,8 @@ def main(argv):
 
 
 if __name__ == "__main__":
-  main(sys.argv)
+  try:
+    main(sys.argv)
+  except RuntimeError, e:
+    print >>sys.stderr, e.args[0]
+    sys.exit(1)

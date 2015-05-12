@@ -141,18 +141,38 @@ UpdatePij <- function(pij, cond_prob) {
   # Update the probability matrix based on the EM algorithm.
   #
   # Args:
-  #   pij: conditional distribution of x (vector)
+  #   pij: conditional distribution of x (MATRIX)
   #   cond_prob: conditional distribution computed previously
+  #      (LIST of matrices)
+  #      TODO: document more
   #
   # Returns:
   #   Updated pijs from em algorithm (maximization)
 
+  print("pij")
+  print(dim(pij))
+  print(pij)
+  print('---')
+  print("cond_prob")
+  print(dim(cond_prob))
+  print(cond_prob)
+  print('---')
+
   wcp <- lapply(cond_prob, function(x) {
-    z <- x * pij
+    z <- x * pij  # element-wise mult ?
+    #print("z1")
+    #print(z)
     z <- z / sum(z)
+    #print("z2")
+    #print(z)
     z[is.nan(z)] <- 0
     z })
-  Reduce("+", wcp) / length(wcp)
+  #print("wcp")  # list of matrices
+  #print(wcp)
+  res <- Reduce("+", wcp) / length(wcp)
+  print("res")
+  print(res)
+  res
 }
 
 NLL <- function(pij, cond_prob) {
@@ -213,6 +233,10 @@ EM <- function(cond_prob, starting_pij = NULL, estimate_var = FALSE,
   if (nrow(pij[[1]]) > 0) {
     # Run EM
     for (i in 1:max_iter) {
+      Log('EM iter %d', i)
+      Log('len cond_prob: %d', length(cond_prob))
+      Log('len p[[i]]: %d', length(pij[[i]]))
+
       pij[[i + 1]] <- UpdatePij(pij[[i]], cond_prob)
       dif <- max(abs(pij[[i + 1]] - pij[[i]]))
       if (dif < epsilon) {
@@ -281,6 +305,13 @@ UpdateJointConditional <- function(cond_report_dist, joint_conditional = NULL) {
   }
 }
 
+Log <- function(fmt, ...) {
+  cat(proc.time()[['elapsed']])
+  cat(' ')
+  cat(sprintf(fmt, ...))
+  cat('\n')
+}
+
 ComputeDistributionEM <- function(reports, report_cohorts,
                                   maps, ignore_other = FALSE,
                                   params,
@@ -314,6 +345,9 @@ ComputeDistributionEM <- function(reports, report_cohorts,
   found_strings <- list()
 
   for (j in (1:num_variables)) {
+    Log("Variable %d", j)
+
+    # list of reports
     variable_report <- reports[[j]]
     variable_cohort <- report_cohorts[[j]]
     map <- maps[[j]]
@@ -355,6 +389,8 @@ ComputeDistributionEM <- function(reports, report_cohorts,
     })
 
     # Update the joint conditional distribution of all variables
+    # NOTE: joint_conditional is the same size as cond_report_dist
+    # which is same length as variable_report
     joint_conditional <- UpdateJointConditional(cond_report_dist,
                                                 joint_conditional)
   }

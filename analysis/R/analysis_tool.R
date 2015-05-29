@@ -20,6 +20,7 @@ library(RJSONIO)
 source("analysis/R/analysis_lib.R")
 source("analysis/R/read_input.R")
 source("analysis/R/decode.R")
+source("analysis/R/util.R")
 
 source("analysis/R/alternative.R")
 
@@ -57,13 +58,6 @@ if (!interactive()) {
   )
   # NOTE: This API is bad; if you add positional_arguments, the return value changes!
   opts <- parse_args(OptionParser(option_list = option_list))
-}
-
-# NOTE: This is in tests/analysis.R too
-Log <- function(...) {
-  cat('rappor_analysis.R: ')
-  cat(sprintf(...))
-  cat('\n')
 }
 
 # Handle the case of redundant cohorts, i.e. the counts file needs to be
@@ -142,7 +136,7 @@ RunOne <- function(opts) {
 # Run multiple models.  There is a CSV experiments config file, and we invoke
 # AnalyzeRAPPOR once for each row in it.
 RunMany <- function(opts) {
-  
+
   # If the date is not specified, run yesterday's analyses only.
   if (opts$start_date == "" && opts$end_date == "") {
     start_date <- Sys.Date() - 1

@@ -31,6 +31,26 @@ gen-reports() {
     _tmp/exp_cpp_reports.csv
 }
 
+rappor-sim() {
+  local num_cohorts=64  # matches params
+
+  make _tmp/rappor_test
+  cd $RAPPOR_SRC
+
+  time cat _tmp/exp_cpp_reports.csv \
+    | client/proto/_tmp/rappor_test $num_cohorts 2>/dev/null \
+    > _tmp/exp_cpp_out.csv
+}
+
+sum-bits() {
+  cd $RAPPOR_SRC
+  export PYTHONPATH=$RAPPOR_SRC/client/python
+  analysis/tools/sum_bits.py \
+    _tmp/cpp_params.csv \
+    < _tmp/exp_cpp_out.csv \
+    > _tmp/exp_cpp_counts.csv
+}
+
 # This part is like rappor_sim.py, but in C++.
 # We take a "client,string" CSV (no header) and want a 'client,cohort,rappor'
 # exp_cpp_out.csv file

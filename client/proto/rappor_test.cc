@@ -106,7 +106,8 @@ int main(int argc, char** argv) {
 
   std::string line;
 
-  std::cout << "client,cohort,rappor";
+  // CSV header
+  std::cout << "client,cohort,rappor\n";
 
   while (true) {
     std::getline(std::cin, line);  // no trailing newline

@@ -56,11 +56,19 @@ encode-demo() {
   make _tmp/rappor_test
   cd $RAPPOR_SRC
   local out=_tmp/encode_demo.txt
-  time head _tmp/exp_cpp_reports.csv \
-    | client/proto/_tmp/rappor_test 1 > $out
+  local num_cohorts=4  # matches params
+  time head -n 100 _tmp/exp_cpp_reports.csv \
+    | client/proto/_tmp/rappor_test $num_cohorts > $out
   echo
   echo OUTPUT
   cat $out
+}
+
+test-rappor-test() {
+  set -x
+  make _tmp/rappor_test 
+  #_tmp/rappor_test bad
+  _tmp/rappor_test 3
 }
 
 true-inputs() {

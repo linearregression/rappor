@@ -14,14 +14,34 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <vector>
 
 #include "rappor.pb.h"
 #include "rappor.h"
 #include "libc_rand.h"
 #include "openssl_impl.h"
 
-int GetCohort(const std::string& client_str) {
-  return 1;
+// Like atoi, but with basic (not exhaustive) error checking.
+bool StringToInt(const char* s, int* result) {
+  bool success = true;
+  char* end;  // mutated by strtol
+
+  *result = strtol(s, &end, 10);  // base 10
+  // If strol didn't consume any characters, it failed.
+  if (end == s) {
+    success = false;
+  }
+  return success;
+}
+
+// Assuming the client string is an integer like "42", return the cohort.
+int GetCohort(const std::string& client_str, int num_cohorts) {
+  int client;
+  bool success = StringToInt(client_str.c_str(), &client);
+  if (!success) {
+    return -1;  // error signaled by invalid cohort
+  }
+  return client % num_cohorts;
 }
 
 // TODO: Params as flags?
@@ -33,7 +53,15 @@ int main(int argc, char** argv) {
   }
   // TODO: num_cohorts.  Then client name is hashed?
 
-  int num_cohorts = atoi(argv[1]);
+  int num_cohorts;
+  bool success = StringToInt(argv[1], &num_cohorts);
+  rappor::log("OK %d", success);
+  if (!success) {
+    rappor::log("Invalid number of cohorts: '%s'", argv[1]);
+    exit(1);
+  }
+  rappor::log("cohorts %d", num_cohorts);
+
   // atoi is lame, can't distinguish 0 from error!
   /*
   if (cohort == 0) {
@@ -57,20 +85,29 @@ int main(int argc, char** argv) {
   // std::string constructor is not EXPLICIT -- gah.
   std::string client_secret("secret");
 
-  int cohort = 3;  // TODO: replace
+  int cohort_tmp = 3;  // TODO: replace
 
   const char* metric_name = "home-page";
-  rappor::Encoder encoder(
-      cohort, num_bits, num_hashes,
-      0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
-      libc_rand);
 
-  assert(encoder.IsValid());  // bad instantiation
+  // Create an encoder for each cohort.
+  std::vector<rappor::Encoder*> encoders(num_cohorts);
+
+  for (int i = 0; i < num_cohorts; ++i) {
+    encoders[i] = new rappor::Encoder(
+        i /*cohort*/, num_bits, num_hashes,
+        0.50 /* prob_f */, rappor::Md5, rappor::Hmac, client_secret, 
+        libc_rand);
+
+    assert(encoders[i]->IsValid());  // bad instantiation
+  }
 
   // maybe have rappor_encode and rappor_demo
   // demo shows how to encode multiple metrics
 
   std::string line;
+
+  std::cout << "client,cohort,rappor";
+
   while (true) {
     std::getline(std::cin, line);  // no trailing newline
     rappor::log("Got line %s", line.c_str());
@@ -88,18 +125,18 @@ int main(int argc, char** argv) {
     std::string client_str = line.substr(0, i);  // everything before comma
     std::string value = line.substr(i + 1);  // everything after
 
-    int cohort = GetCohort(client_str);
+    int cohort = GetCohort(client_str, num_cohorts);
     if (cohort == -1) {
       rappor::log("Error calculating cohort for %s", client_str.c_str());
       break;
     }
 
-    rappor::log("CLIENT %s VALUE %s", client_str.c_str(), value.c_str());
+    rappor::log("CLIENT %s VALUE %s COHORT %d", client_str.c_str(), value.c_str(), cohort);
 
     // TODO: split the line.  It looks like "client,string"
 
     std::string out;
-    bool ok = encoder.Encode(line, &out);
+    bool ok = encoders[i]->Encode(line, &out);
     rappor::log("encoded %s", line.c_str());
 
     // NOTE: Are there really encoding errors?
@@ -108,6 +145,11 @@ int main(int argc, char** argv) {
       break;
     }
     reports.add_report(out);
+
+    std::cout << client_str;
+    std::cout << ',';
+    std::cout << cohort;
+    std::cout << ',';
 
     // print significant bit first
     for (int i = out.size() - 1; i >= 0; --i) {
@@ -123,8 +165,13 @@ int main(int argc, char** argv) {
   rappor::ReportListHeader* header = reports.mutable_header();
   // client params?
   header->set_metric_name(metric_name);
-  header->set_cohort(cohort);
+  header->set_cohort(cohort_tmp);
   header->mutable_params()->CopyFrom(params);
 
   rappor::log("report list %s", reports.DebugString().c_str());
+
+  // Cleanup
+  for (int i = 0; i < num_cohorts; ++i) {
+    delete encoders[i];
+  }
 }

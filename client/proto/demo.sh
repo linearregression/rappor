@@ -126,19 +126,23 @@ import collections
 import csv
 import sys
 
-num_cohorts = int(sys.argv[1])  # multiply counts by this number
-
 counter = collections.Counter()
-with open(sys.argv[2]) as in_file:
+with open(sys.argv[1]) as in_file:
   for line in in_file:
-    counter[line.strip()] += 1
+    line = line.strip()
+    try:
+      value = line.split(",")[1]  # second row
+    except IndexError:
+      print value
+      raise
+    counter[value] += 1
 
-with open(sys.argv[3], "w") as out_file:
+with open(sys.argv[2], "w") as out_file:
   c = csv.writer(out_file)
   c.writerow(("string", "count"))
   for value, count in counter.iteritems():
-    c.writerow((value, str(count * num_cohorts)))
-' 64 $RAPPOR_SRC/_tmp/cpp.txt $RAPPOR_SRC/_tmp/cpp_hist.csv
+    c.writerow((value, str(count)))
+' $RAPPOR_SRC/_tmp/${DIST}_reports.csv $RAPPOR_SRC/_tmp/${DIST}_hist.csv
 }
 
 # We are currently using 64 cohorts
@@ -161,8 +165,12 @@ compare-dist() {
   local instance_dir=_tmp/1
   local out_dir=${instance_dir}_report
 
+  # Temporary hack until analyze.R has better syntax.
   mkdir -p $instance_dir
   cp --verbose _tmp/${DIST}_counts.csv $instance_dir
+  cp --verbose _tmp/${DIST}_hist.csv $instance_dir
+
+  mkdir --verbose -p $out_dir
 
   echo "Analyzing RAPPOR output ($dist)"
   tests/analyze.R -t "exp cpp" \

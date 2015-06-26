@@ -1,4 +1,5 @@
 #include "rappor_deps.h"
+//#include "rappor.h"  // log
 
 #include <string>
 
@@ -12,6 +13,9 @@ namespace rappor {
 // of type HmacFunc in rappor_deps.h
 bool Hmac(const std::string& key, const std::string& value,
           Sha256Digest output) {
+  //log("key %s", key.c_str());
+  //log("value %s", value.c_str());
+
   return HMAC(EVP_sha256(),
               key.c_str(), key.size(),
               // std::string has 'char', OpenSSL wants unsigned char.

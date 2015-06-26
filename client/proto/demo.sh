@@ -28,21 +28,28 @@ gen-reports() {
   local num_clients=10000
   local values_per_client=10
   tests/gen_reports.R exp $num_unique_values $num_clients $values_per_client \
-    _tmp/cpp_reports.csv
+    _tmp/exp_cpp_reports.csv
 }
 
-# We want a 'client,cohort,rappor' exp_out.csv file
+# This part is like rappor_sim.py, but in C++.
+# We take a "client,string" CSV (no header) and want a 'client,cohort,rappor'
+# exp_cpp_out.csv file
+#
+# TODO: rappor_test.cc can generate a new client every time I guess.
 
 encode-cohort() {
+  make _tmp/rappor_test
+  cd $RAPPOR_SRC
+
   local cohort=$1
 
   # Disregard logs on stderr
   # Client is stubbed out
 
-  cat _tmp/exp.txt \
-    | _tmp/rappor_test $cohort 2>/dev/null \
-    | awk -v cohort=$cohort -v client=0 '{print client "," cohort "," $1 }' \
-    > _tmp/cohort_$cohort.csv
+  cat _tmp/exp_cpp_reports.csv \
+    | client/proto/_tmp/rappor_test $cohort 2>/dev/null #\
+    #| awk -v cohort=$cohort -v client=0 '{print client "," cohort "," $1 }' \
+    #> _tmp/cohort_$cohort.csv
 }
 
 true-inputs() {

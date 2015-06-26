@@ -9,12 +9,14 @@ _tmp/rappor_test: _tmp/rappor.pb.h rappor.cc rappor.h \
 # -lprotobuf comes after source files
 # -lrt for high resolution clock_gettime
 # -lcrypto from openssl
+# -g for debug info
 	$(CXX) \
     -I _tmp \
     -o _tmp/rappor_test \
     _tmp/rappor.pb.cc rappor.cc libc_rand.cc openssl_impl.cc rappor_test.cc \
     -lprotobuf \
-    -lcrypto
+    -lcrypto \
+		-g
 
 # c++0x for std::array
 		#-std=c++0x 

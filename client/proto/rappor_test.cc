@@ -47,7 +47,9 @@ int main(int argc, char** argv) {
   rappor::LibcRandGlobalInit();  // seed
   rappor::LibcRand libc_rand(params.num_bits(), 0.50 /*p*/, 0.75 /*q*/);
 
-  const char* client_secret = "secret";
+  // NOTE: If const char*, it crashes, I guess because of temporary.
+  // std::string constructor is not EXPLICIT -- gah.
+  std::string client_secret("secret");
 
   const char* metric_name = "home-page";
   rappor::Encoder encoder(
@@ -63,11 +65,16 @@ int main(int argc, char** argv) {
   std::string line;
   while (true) {
     std::getline(std::cin, line);  // no trailing newline
+    rappor::log("Got line %s", line.c_str());
     if (line.empty()) {
       break;
     }
+
+    // TODO: split the line.  It looks like "client,string"
+
     std::string out;
     bool ok = encoder.Encode(line, &out);
+    rappor::log("encoded %s", line.c_str());
 
     // NOTE: Are there really encoding errors?
     if (!ok) {

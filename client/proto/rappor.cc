@@ -139,6 +139,9 @@ void PrintSha256(Sha256Digest h) {
 }
 
 bool Encoder::Encode(const std::string& value, std::string* output) const {
+
+  rappor::log("Encode");
+
   Bits bloom = 0;
 
   // First do hashing.
@@ -169,6 +172,8 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
     bloom |= 1 << bit_to_set;
     log("Hash %d, set bit %d", i, bit_to_set);
   }
+
+  log("SHA256 client secret: %s value: %s\n", client_secret_.c_str(), value.c_str());
 
   // Do PRR.
 

@@ -2,6 +2,8 @@
 
 #include "openssl_impl.h"
 
+// NOTE: See run.sh to compare HMAC and MD5 values with Python.
+
 int main() {
   std::string key("key");
   std::string value("value");

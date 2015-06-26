@@ -29,6 +29,7 @@ empty-input() {
   echo -n '' | rappor-test 5 
 }
 
+# This outputs an HMAC and MD5 value.  Compare with Python/shell below.
 hmac-openssl-test() {
   make _tmp/hmac_openssl_test
   _tmp/hmac_openssl_test

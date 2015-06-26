@@ -9,12 +9,26 @@ set -o errexit
 
 readonly RAPPOR_SRC=$(cd ../.. && pwd)
 
+# Params from rappor_test
+gen-params() {
+  cat >$RAPPOR_SRC/_tmp/cpp_params.csv <<EOF
+k,h,m,p,q,f
+16,2,64,0.5,0.75,0.5
+EOF
+}
+
 # Generate files in line mode
 
 # We will have 64 cohorts
-gen-sim-input() {
+gen-reports() {
+  cd $RAPPOR_SRC
+
   #../../tests/gen_sim_input.py -h
-  ../../tests/gen_sim_input.py -e -l 1000 -o $RAPPOR_SRC/_tmp/cpp.txt
+  local num_unique_values=100
+  local num_clients=10000
+  local values_per_client=10
+  tests/gen_reports.R exp $num_unique_values $num_clients $values_per_client \
+    _tmp/cpp_reports.csv
 }
 
 # We want a 'client,cohort,rappor' exp_out.csv file
@@ -79,20 +93,14 @@ encode-all() {
   wc -l $out
 }
 
-# Params from rappor_test
-params() {
-  cat >$RAPPOR_SRC/_tmp/cpp_params.csv <<EOF
-k,h,m,p,q,f
-16,2,64,0.5,0.75,0.5
-EOF
-}
-
 run-cpp() {
   cd $RAPPOR_SRC
   local dist=cpp  # fake one
 
   echo "Hashing Candidates ($dist)"
-  ./demo.sh hash-candidates $dist
+  analysis/tools/hash_candidates.py \
+    $RAPPOR_SRC/_tmp/cpp_params.csv \
+    < $RAPPOR_SRC/_tmp/cpp_params.csv \
 
   echo "Summing bits ($dist)"
   ./demo.sh sum-bits $dist

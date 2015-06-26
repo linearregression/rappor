@@ -20,6 +20,10 @@
 #include "libc_rand.h"
 #include "openssl_impl.h"
 
+int GetCohort(const std::string& client_str) {
+  return 1;
+}
+
 // TODO: Params as flags?
 
 int main(int argc, char** argv) {
@@ -27,7 +31,9 @@ int main(int argc, char** argv) {
     rappor::log("Usage: rappor_encode <cohort>");
     exit(1);
   }
-  int cohort = atoi(argv[1]);
+  // TODO: num_cohorts.  Then client name is hashed?
+
+  int num_cohorts = atoi(argv[1]);
   // atoi is lame, can't distinguish 0 from error!
   /*
   if (cohort == 0) {
@@ -51,6 +57,8 @@ int main(int argc, char** argv) {
   // std::string constructor is not EXPLICIT -- gah.
   std::string client_secret("secret");
 
+  int cohort = 3;  // TODO: replace
+
   const char* metric_name = "home-page";
   rappor::Encoder encoder(
       cohort, num_bits, num_hashes,
@@ -66,9 +74,27 @@ int main(int argc, char** argv) {
   while (true) {
     std::getline(std::cin, line);  // no trailing newline
     rappor::log("Got line %s", line.c_str());
+
     if (line.empty()) {
       break;
     }
+
+    size_t i = line.find(',');
+    if (i == std::string::npos) {
+      rappor::log("Expected , in line %s", line.c_str());
+      break;
+    }
+
+    std::string client_str = line.substr(0, i);  // everything before comma
+    std::string value = line.substr(i + 1);  // everything after
+
+    int cohort = GetCohort(client_str);
+    if (cohort == -1) {
+      rappor::log("Error calculating cohort for %s", client_str.c_str());
+      break;
+    }
+
+    rappor::log("CLIENT %s VALUE %s", client_str.c_str(), value.c_str());
 
     // TODO: split the line.  It looks like "client,string"
 

@@ -46,10 +46,21 @@ encode-cohort() {
   # Disregard logs on stderr
   # Client is stubbed out
 
-  cat _tmp/exp_cpp_reports.csv \
+  time cat _tmp/exp_cpp_reports.csv \
     | client/proto/_tmp/rappor_test $cohort 2>/dev/null #\
+    > _tmp/cohort_$cohort.csv
     #| awk -v cohort=$cohort -v client=0 '{print client "," cohort "," $1 }' \
-    #> _tmp/cohort_$cohort.csv
+}
+
+encode-demo() {
+  make _tmp/rappor_test
+  cd $RAPPOR_SRC
+  local out=_tmp/encode_demo.txt
+  time head _tmp/exp_cpp_reports.csv \
+    | client/proto/_tmp/rappor_test 1 > $out
+  echo
+  echo OUTPUT
+  cat $out
 }
 
 true-inputs() {

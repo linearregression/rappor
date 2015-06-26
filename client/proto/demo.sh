@@ -47,13 +47,13 @@ make-candidates() {
 }
 
 make-map() {
-  local dist=exp_cpp
+  local dist=$DIST
 
   cd $RAPPOR_SRC
   export PYTHONPATH=$RAPPOR_SRC/client/python
 
   analysis/tools/hash_candidates.py \
-    _tmp/cpp_params.csv \
+    _tmp/${dist}_params.csv \
     < _tmp/${dist}_candidates.txt \
     > _tmp/${dist}_map.csv
 }
@@ -73,9 +73,9 @@ sum-bits() {
   cd $RAPPOR_SRC
   export PYTHONPATH=$RAPPOR_SRC/client/python
   analysis/tools/sum_bits.py \
-    _tmp/cpp_params.csv \
-    < _tmp/exp_cpp_out.csv \
-    > _tmp/exp_cpp_counts.csv
+    _tmp/${DIST}_params.csv \
+    < _tmp/${DIST}_out.csv \
+    > _tmp/${DIST}_counts.csv
 }
 
 # This part is like rappor_sim.py, but in C++.
@@ -143,18 +143,6 @@ with open(sys.argv[2], "w") as out_file:
   for value, count in counter.iteritems():
     c.writerow((value, str(count)))
 ' $RAPPOR_SRC/_tmp/${DIST}_reports.csv $RAPPOR_SRC/_tmp/${DIST}_hist.csv
-}
-
-# We are currently using 64 cohorts
-encode-all() {
-  local max=$(expr $NUM_COHORTS - 1)
-  for cohort in $(seq 0 $max); do
-    echo "Cohort $cohort"
-    encode-cohort $cohort
-  done
-  local out=$RAPPOR_SRC/_tmp/cpp_out.csv
-  { echo 'client,cohort,rappor'; cat _tmp/cohort_*.csv; } > $out
-  wc -l $out
 }
 
 compare-dist() {

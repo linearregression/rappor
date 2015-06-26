@@ -31,6 +31,31 @@ gen-reports() {
     _tmp/exp_cpp_reports.csv
 }
 
+print-true-inputs() {
+  cd $RAPPOR_SRC
+  ./regtest.sh print-true-inputs 100 > _tmp/exp_cpp_true_inputs.txt
+}
+
+# Print candidates from true inpputs
+make-candidates() {
+  local dist=exp_cpp
+  cp \
+    $RAPPOR_SRC/_tmp/${dist}_true_inputs.txt \
+    $RAPPOR_SRC/_tmp/${dist}_candidates.txt
+}
+
+make-map() {
+  local dist=exp_cpp
+
+  cd $RAPPOR_SRC
+  export PYTHONPATH=$RAPPOR_SRC/client/python
+
+  analysis/tools/hash_candidates.py \
+    _tmp/cpp_params.csv \
+    < _tmp/${dist}_candidates.txt \
+    > _tmp/${dist}_map.csv
+}
+
 rappor-sim() {
   local num_cohorts=64  # matches params
 
@@ -91,19 +116,6 @@ test-rappor-test() {
   _tmp/rappor_test 3
 }
 
-true-inputs() {
-  local dist=cpp
-  cat $RAPPOR_SRC/_tmp/${dist}.txt | sort | uniq \
-    > $RAPPOR_SRC/_tmp/${dist}_true_inputs.txt
-}
-
-candidates() {
-  local dist=cpp
-  cp \
-    $RAPPOR_SRC/_tmp/${dist}_true_inputs.txt \
-    $RAPPOR_SRC/_tmp/${dist}_candidates.txt
-}
-
 readonly NUM_COHORTS=64
 
 histogram() {
@@ -148,8 +160,6 @@ run-cpp() {
     $RAPPOR_SRC/_tmp/cpp_params.csv \
     < $RAPPOR_SRC/_tmp/cpp_params.csv \
 
-  echo "Summing bits ($dist)"
-  ./demo.sh sum-bits $dist
 
   # TODO:
   # guess-candidates  # cheat and get them from the true input

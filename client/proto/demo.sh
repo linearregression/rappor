@@ -9,9 +9,11 @@ set -o errexit
 
 readonly RAPPOR_SRC=$(cd ../.. && pwd)
 
+readonly DIST=exp_cpp
+
 # Params from rappor_test
 gen-params() {
-  cat >$RAPPOR_SRC/_tmp/cpp_params.csv <<EOF
+  cat >$RAPPOR_SRC/_tmp/${DIST}_params.csv <<EOF
 k,h,m,p,q,f
 16,2,64,0.5,0.75,0.5
 EOF
@@ -151,32 +153,22 @@ encode-all() {
   wc -l $out
 }
 
-run-cpp() {
+compare-dist() {
   cd $RAPPOR_SRC
-  local dist=cpp  # fake one
+  local dist=exp_cpp  # fake one
 
-  echo "Hashing Candidates ($dist)"
-  analysis/tools/hash_candidates.py \
-    $RAPPOR_SRC/_tmp/cpp_params.csv \
-    < $RAPPOR_SRC/_tmp/cpp_params.csv \
+  local case_dir=_tmp
+  local instance_dir=_tmp/1
+  local out_dir=${instance_dir}_report
 
-
-  # TODO:
-  # guess-candidates  # cheat and get them from the true input
-  # hash-candidates  # create map file
+  mkdir -p $instance_dir
+  cp --verbose _tmp/${DIST}_counts.csv $instance_dir
 
   echo "Analyzing RAPPOR output ($dist)"
-  ./demo.sh analyze $dist "Distribution Comparison ($dist)"
-
-}
-
-# FAILING
-analyze() {
-  cd $RAPPOR_SRC
-  local dist=cpp  # fake one
-
-  echo "Analyzing RAPPOR output ($dist)"
-  time ./demo.sh analyze $dist "Distribution Comparison ($dist)" || true
+  tests/analyze.R -t "exp cpp" \
+    $case_dir/$dist \
+    $instance_dir/$dist \
+    $out_dir
 }
 
 "$@"

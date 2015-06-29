@@ -21,6 +21,7 @@ Note that we use SHA1 for the Bloom filter hash function.
 """
 import csv
 import hashlib
+import hmac
 import json
 import random
 
@@ -196,6 +197,14 @@ def get_bf_bit(input_word, cohort, hash_no, num_bloombits):
   # but 2^16 = 65536 is more than enough.  Default is 16 bits.
   a, b = sha1[0], sha1[1]
   return (ord(a) + ord(b) * 256) % num_bloombits
+
+
+# TODO:
+#
+# - Cohort should be passed in; Should return IRR only
+# - IRR should be based on a client_secret
+#   - use hmac
+# - hash function should be md5
 
 
 class Encoder(object):

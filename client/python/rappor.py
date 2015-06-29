@@ -24,6 +24,7 @@ import hashlib
 import hmac
 import json
 import random
+import struct
 
 
 class Error(Exception):
@@ -189,14 +190,25 @@ def get_rappor_masks(user_id, word, params, rand_funcs):
   return assigned_cohort, uniform, f_mask
 
 
-def get_bf_bit(input_word, cohort, hash_no, num_bloombits):
+def cohort_to_bytes(cohort):
+  # https://docs.python.org/2/library/struct.html
+  # - Big Endian (>) for consistent network byte order.
+  # - L means 4 bytes when using >
+  return struct.pack('>L', cohort)
+
+
+def get_bf_bit(word, cohort, hash_no, num_bloombits):
   """Returns the bit to set in the Bloom filter."""
-  h = '%s%s%s' % (cohort, hash_no, input_word)
-  sha1 = hashlib.sha1(h).digest()
-  # Use last two bytes as the hash.  We to allow want more than 2^8 = 256 bits,
-  # but 2^16 = 65536 is more than enough.  Default is 16 bits.
-  a, b = sha1[0], sha1[1]
-  return (ord(a) + ord(b) * 256) % num_bloombits
+  value = cohort_to_bytes(cohort) + word  # Cohort is 4 byte prefix.
+  md5 = hashlib.md5(value).digest()
+
+  # Each has is a byte, which means we could have up to 256 bit Bloom filters.
+  # There are 16 bytes in an MD5, in which case we can have up to 16 hash
+  # functions per Bloom filter.
+  if hash_no > len(md5):
+    raise RuntimeError("Can't have more than %d hashes" % md5)
+
+  return ord(md5[hash_no]) % num_bloombits
 
 
 def make_bloom_bits(word, cohort, num_hashes, num_bloombits):

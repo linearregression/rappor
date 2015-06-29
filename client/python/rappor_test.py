@@ -84,29 +84,23 @@ class RapporParamsTest(unittest.TestCase):
     self.assertEquals(0x0006db6, mask_indices)
 
   def testGetBFBit(self):
-    cohort = 0
-    hash_no = 0
-    input_word = "abc"
     ti = self.typical_instance
-    # expected_hash = ("\x13O\x0b\xa0\xcc\xc5\x89\x01oI\x85\xc8\xc3P\xfe\xa7 H"
-    #                  "\xb0m")
-    # Output should be
-    # (ord(expected_hash[0]) + ord(expected_hash[1])*256) % 16
-    expected_output = 3
-    actual = rappor.get_bf_bit(input_word, cohort, hash_no, ti.num_bloombits)
-    self.assertEquals(expected_output, actual)
 
-    hash_no = 1
-    # expected_hash = ("\xb6\xcc\x7f\xee@\x95\xb0\xdb\xf5\xf1z\xc7\xdaPM"
-    #                  "\xd4\xd6u\xed3")
-    expected_output = 6
-    actual = rappor.get_bf_bit(input_word, cohort, hash_no, ti.num_bloombits)
-    self.assertEquals(expected_output, actual)
+    actual = rappor.get_bf_bit("abc", 0, 0, ti.num_bloombits)
+    self.assertEquals(6, actual)
+
+    actual = rappor.get_bf_bit("abc", 0, 1, ti.num_bloombits)
+    self.assertEquals(13, actual)
 
   def testMakeBloomBits(self):
     for cohort in xrange(0, 64):
       b = rappor.make_bloom_bits('foo', cohort, 2, 16)
       print 'cohort', cohort, 'bloom', b
+
+  def testCohortToBytes(self):
+    b = rappor.cohort_to_bytes(1)
+    print repr(b)
+    self.assertEqual(4, len(b))
 
   def testGetRapporMasksWithOnePRR(self):
     # Set randomness function to be used to sample 32 random bits

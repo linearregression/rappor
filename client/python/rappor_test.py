@@ -83,13 +83,13 @@ class RapporParamsTest(unittest.TestCase):
     self.assertEquals(0x000db6d, f_bits)  # dependent on 3 MockRandom values
     self.assertEquals(0x0006db6, mask_indices)
 
-  def testGetBFBit(self):
+  def testWhichBit(self):
     ti = self.typical_instance
 
-    actual = rappor.get_bf_bit("abc", 0, 0, ti.num_bloombits)
+    actual = rappor.which_bit("abc", 0, 0, ti.num_bloombits)
     self.assertEquals(6, actual)
 
-    actual = rappor.get_bf_bit("abc", 0, 1, ti.num_bloombits)
+    actual = rappor.which_bit("abc", 0, 1, ti.num_bloombits)
     self.assertEquals(13, actual)
 
   def testMakeBloomBits(self):

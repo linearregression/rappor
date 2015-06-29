@@ -197,25 +197,28 @@ def cohort_to_bytes(cohort):
   return struct.pack('>L', cohort)
 
 
-def get_bf_bit(word, cohort, hash_no, num_bloombits):
-  """Returns the bit to set in the Bloom filter."""
+def which_bit(word, cohort, hash_num, num_bloombits):
+  """Returns the bit to set in the Bloom filter.
+
+  NOTE: This is called by hash_candidates.py to make the map file.
+  """
   value = cohort_to_bytes(cohort) + word  # Cohort is 4 byte prefix.
   md5 = hashlib.md5(value).digest()
 
   # Each has is a byte, which means we could have up to 256 bit Bloom filters.
   # There are 16 bytes in an MD5, in which case we can have up to 16 hash
   # functions per Bloom filter.
-  if hash_no > len(md5):
+  if hash_num > len(md5):
     raise RuntimeError("Can't have more than %d hashes" % md5)
 
-  return ord(md5[hash_no]) % num_bloombits
+  return ord(md5[hash_num]) % num_bloombits
 
 
 def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
   """Compute Bloom Filter."""
   bloom_bits = 0
-  for hash_no in xrange(num_hashes):
-    bit_to_set = get_bf_bit(word, cohort, hash_no, num_bloombits)
+  for hash_num in xrange(num_hashes):
+    bit_to_set = which_bit(word, cohort, hash_num, num_bloombits)
     bloom_bits |= (1 << bit_to_set)
   return bloom_bits
 

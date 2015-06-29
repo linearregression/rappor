@@ -32,8 +32,8 @@ def HashCandidates(params, stdin, stdout):
     word = line.strip()
     row = [word]
     for cohort in xrange(params.num_cohorts):
-      for hash_no in xrange(params.num_hashes):
-        bf_bit = rappor.get_bf_bit(word, cohort, hash_no, num_bloombits)
+      for hash_num in xrange(params.num_hashes):
+        bf_bit = rappor.which_bit(word, cohort, hash_num, num_bloombits)
         # bits are indexed from 1.  Add a fixed offset for each cohort.
         # NOTE: This detail could be omitted from the map file format, and done
         # in R.

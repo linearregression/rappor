@@ -199,6 +199,15 @@ def get_bf_bit(input_word, cohort, hash_no, num_bloombits):
   return (ord(a) + ord(b) * 256) % num_bloombits
 
 
+def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
+  """Compute Bloom Filter."""
+  bloom_bits = 0
+  for hash_no in xrange(num_hashes):
+    bit_to_set = get_bf_bit(word, cohort, hash_no, num_bloombits)
+    bloom_bits |= (1 << bit_to_set)
+  return bloom_bits
+
+
 # TODO:
 #
 # - Cohort should be passed in; Should return IRR only
@@ -233,11 +242,7 @@ class Encoder(object):
                                                params,
                                                self.rand_funcs)
 
-    bloom_bits_array = 0
-    # Compute Bloom Filter
-    for hash_no in xrange(params.num_hashes):
-      bit_to_set = get_bf_bit(word, cohort, hash_no, params.num_bloombits)
-      bloom_bits_array |= (1 << bit_to_set)
+    bloom_bits = make_bloom_bits(word, cohort, params.num_hashes, params.num_bloombits)
 
     # Both bit manipulations below use the following fact:
     # To set c = a if m = 0 or b if m = 1
@@ -253,11 +258,11 @@ class Encoder(object):
     # probability f.  So in the expression below:
     #
     # - Bits in (uniform & f_mask) are 1 with probability f/2.
-    # - (bloom_bits_array & ~f_mask) clears a bloom filter bit with probability
+    # - (bloom_bits & ~f_mask) clears a bloom filter bit with probability
     # f, so we get B_i with probability 1-f.
     # - The remaining bits are 0, with remaining probability f/2.
 
-    prr = (uniform & f_mask) | (bloom_bits_array & ~f_mask)
+    prr = (uniform & f_mask) | (bloom_bits & ~f_mask)
 
     # Compute instantaneous randomized response:
     # If PRR bit is set, output 1 with probability q

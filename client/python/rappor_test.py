@@ -103,6 +103,11 @@ class RapporParamsTest(unittest.TestCase):
     actual = rappor.get_bf_bit(input_word, cohort, hash_no, ti.num_bloombits)
     self.assertEquals(expected_output, actual)
 
+  def testMakeBloomBits(self):
+    for cohort in xrange(0, 64):
+      b = rappor.make_bloom_bits('foo', cohort, 2, 16)
+      print 'cohort', cohort, 'bloom', b
+
   def testGetRapporMasksWithOnePRR(self):
     # Set randomness function to be used to sample 32 random bits
     # Set randomness function that takes two integers and returns a

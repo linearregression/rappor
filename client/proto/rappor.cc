@@ -122,7 +122,7 @@ bool Encoder::IsValid() const {
 
 void PrintMd5(Md5Digest md5) {
   // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
-  for (int i = 0; i < sizeof(Md5Digest); ++i) {
+  for (size_t i = 0; i < sizeof(Md5Digest); ++i) {
     //printf("[%d]\n", i);
     fprintf(stderr, "%02x", md5[i]);
   }
@@ -131,7 +131,7 @@ void PrintMd5(Md5Digest md5) {
 
 void PrintSha256(Sha256Digest h) {
   // GAH!  sizeof(md5) does NOT work.  Because that's a pointer.
-  for (int i = 0; i < sizeof(Sha256Digest); ++i) {
+  for (size_t i = 0; i < sizeof(Sha256Digest); ++i) {
     //printf("[%d]\n", i);
     fprintf(stderr, "%02x", h[i]);
   }

@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
       unsigned char byte = out[i];
       for (int j = 7; j >= 0; --j) {
         bool bit = byte & (1 << j);
-        std::cout << bit ? "1" : "0";
+        std::cout << (bit ? "1" : "0");
       }
     }
     std::cout << "\n";

@@ -239,6 +239,7 @@ def which_bit(word, cohort, hash_num, num_bloombits):
   if hash_num > len(digest):
     raise RuntimeError("Can't have more than %d hashes" % md5)
 
+  log('hash_input %r', value)
   log('Cohort %d', cohort)
   log('MD5 %s', md5.hexdigest())
 

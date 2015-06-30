@@ -44,6 +44,18 @@ int GetCohort(const std::string& client_str, int num_cohorts) {
   return client % num_cohorts;
 }
 
+
+void BitsToString(rappor::Bits b, std::string* output, int num_bytes) {
+  // Copy IRR into a string, which can go in a protobuf.
+  output->assign(num_bytes, '\0');
+  for (int i = 0; i < num_bytes; ++i) {
+    rappor::log("i: %d", i);
+    // "little endian" string
+    (*output)[i] = b & 0xFF;  // last byte
+    b >>= 8;
+  }
+}
+
 void PrintBitString(const std::string& s) {
   // print significant bit first
   for (int i = s.size() - 1; i >= 0; --i) {
@@ -84,6 +96,8 @@ int main(int argc, char** argv) {
   rappor::ReportList reports;
 
   int num_bits = 8;
+  int num_bytes = num_bits / 8;
+
   int num_hashes = 2;
   rappor::Params params;
   params.set_num_bits(num_bits);
@@ -146,24 +160,31 @@ int main(int argc, char** argv) {
     rappor::log("CLIENT %s VALUE %s COHORT %d", client_str.c_str(),
         value.c_str(), cohort);
 
-    // TODO: This should be uint64.
-    std::string irr;
-    bool ok = encoders[i]->Encode(line, &irr);
-    rappor::log("encoded %s", line.c_str());
+    rappor::Bits prr;
+    rappor::Bits irr;
+    bool ok = encoders[i]->Encode(line, &prr, &irr);
 
     // NOTE: Are there really encoding errors?
     if (!ok) {
       rappor::log("Error encoding string %s", line.c_str());
       break;
     }
-    reports.add_report(irr);
+
+    std::string irr_str;
+    BitsToString(irr, &irr_str, num_bytes);
+
+    std::string prr_str;
+    BitsToString(prr, &prr_str, num_bytes);
+
+    reports.add_report(irr_str);
 
     std::cout << client_str;
     std::cout << ',';
     std::cout << cohort;
     std::cout << ',';
-
-    PrintBitString(irr);
+    PrintBitString(prr_str);
+    std::cout << ',';
+    PrintBitString(irr_str);
 
     std::cout << "\n";
   }

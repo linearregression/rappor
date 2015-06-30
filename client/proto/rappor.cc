@@ -27,14 +27,6 @@ void log(const char* fmt, ...) {
   fprintf(stderr, "\n");
 }
 
-// TODO:
-// - Put this in the header
-// - Encode() should return it
-//   - Then print it (with a mask)
-// - typedef unsigned int Bits
-//   - rappor::Bits type is used for Bloom Filter, PRR, and IRR
-
-typedef unsigned long Bits; 
 
 // The number of bits for one hash function is log2(number of bloom filter
 // bits).
@@ -138,7 +130,8 @@ void PrintSha256(Sha256Digest h) {
   fprintf(stderr, "\n");
 }
 
-bool Encoder::Encode(const std::string& value, std::string* output) const {
+bool Encoder::Encode(const std::string& value, Bits* prr_out, Bits* irr_out)
+  const {
 
   rappor::log("Encode");
 
@@ -216,6 +209,7 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   // second term: 0 with 1/2 probability, B with 1/2 probability
   // NOTE: bloom is already 8 bits, while the others are 64 bits.
   uint64_t prr = (f_bits & uniform) | (bloom & ~uniform);
+  *prr_out = prr;
   log("prr: %08x", prr & debug_mask_);
 
   // Do IRR.
@@ -230,15 +224,8 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
 
   log("irr: %x", irr);
 
-  // Copy IRR into a string, which can go in a protobuf.
+  *irr_out = irr;
 
-  output->assign(num_bytes_, '\0');
-  for (int i = 0; i < num_bytes_; ++i) {
-    log("i: %d", i);
-    // "little endian" string
-    (*output)[i] = irr & 0xFF;  // last byte
-    irr >>= 8;
-  }
   return true;
 }
 

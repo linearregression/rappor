@@ -22,6 +22,9 @@
 
 namespace rappor {
 
+// rappor::Bits type is used for Bloom Filter, PRR, and IRR
+typedef unsigned long Bits; 
+
 class Encoder {
  public:
   // TODO:
@@ -48,7 +51,7 @@ class Encoder {
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
-  bool Encode(const std::string& value, std::string* output) const;
+  bool Encode(const std::string& value, Bits* prr_out, Bits* irr_out) const;
 
  private:
   const int cohort_;

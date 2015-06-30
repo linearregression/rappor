@@ -51,7 +51,8 @@ class Encoder {
   // Check this immediately after instantiating.  We are not using exceptions.
   bool IsValid() const;
 
-  bool Encode(const std::string& value, Bits* prr_out, Bits* irr_out) const;
+  bool Encode(const std::string& value, Bits* bloom_out, Bits* prr_out, Bits*
+      irr_out) const;
 
  private:
   const int cohort_;

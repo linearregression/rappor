@@ -68,7 +68,7 @@ rappor-sim() {
   time cat _tmp/exp_cpp_reports.csv \
     | client/proto/_tmp/rappor_test $num_cohorts 2>/dev/null \
     > $out
-  head $out
+  head -n 30 $out
 }
 
 rappor-sim-golden() {
@@ -89,7 +89,7 @@ rappor-sim-golden() {
     --out-prefix $out/exp_cpp
 
   ls -al $out
-  head $out/exp_cpp_out.csv
+  head -n 30 $out/exp_cpp_out.csv
 }
 
 sum-bits() {

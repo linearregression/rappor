@@ -130,8 +130,8 @@ void PrintSha256(Sha256Digest h) {
   fprintf(stderr, "\n");
 }
 
-bool Encoder::Encode(const std::string& value, Bits* prr_out, Bits* irr_out)
-  const {
+bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
+    Bits* irr_out) const {
 
   rappor::log("Encode");
 
@@ -166,6 +166,7 @@ bool Encoder::Encode(const std::string& value, Bits* prr_out, Bits* irr_out)
     bloom |= 1 << bit_to_set;
     log("Hash %d, set bit %d", i, bit_to_set);
   }
+  *bloom_out = bloom;
 
   log("SHA256 client secret: %s value: %s\n", client_secret_.c_str(), value.c_str());
 

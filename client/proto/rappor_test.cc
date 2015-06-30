@@ -160,9 +160,10 @@ int main(int argc, char** argv) {
     rappor::log("CLIENT %s VALUE %s COHORT %d", client_str.c_str(),
         value.c_str(), cohort);
 
+    rappor::Bits bloom;
     rappor::Bits prr;
     rappor::Bits irr;
-    bool ok = encoders[i]->Encode(line, &prr, &irr);
+    bool ok = encoders[i]->Encode(line, &bloom, &prr, &irr);
 
     // NOTE: Are there really encoding errors?
     if (!ok) {
@@ -170,17 +171,22 @@ int main(int argc, char** argv) {
       break;
     }
 
-    std::string irr_str;
-    BitsToString(irr, &irr_str, num_bytes);
+    std::string bloom_str;
+    BitsToString(bloom, &bloom_str, num_bytes);
 
     std::string prr_str;
     BitsToString(prr, &prr_str, num_bytes);
+
+    std::string irr_str;
+    BitsToString(irr, &irr_str, num_bytes);
 
     reports.add_report(irr_str);
 
     std::cout << client_str;
     std::cout << ',';
     std::cout << cohort;
+    std::cout << ',';
+    PrintBitString(bloom_str);
     std::cout << ',';
     PrintBitString(prr_str);
     std::cout << ',';

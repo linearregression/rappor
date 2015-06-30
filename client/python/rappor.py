@@ -301,7 +301,7 @@ class Encoder(object):
 
     irr = (p_bits & ~prr) | (q_bits & prr)
 
-    return prr, irr  # IRR is the rappor
+    return bloom_bits, prr, irr  # IRR is the rappor
 
   def encode(self, word):
     """Encode a string with RAPPOR.
@@ -312,5 +312,5 @@ class Encoder(object):
     Returns:
       A number that is the IRR (Instantaneous Randomized Response).
     """
-    _, irr = self._internal_encode(word)
+    _, _, irr = self._internal_encode(word)
     return irr

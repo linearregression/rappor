@@ -187,7 +187,7 @@ def main(argv):
     csv_in = csv.reader(f_in)
     csv_out = csv.writer(f_out)
 
-    header = ('client', 'cohort', 'prr', 'rappor')
+    header = ('client', 'cohort', 'bloom', 'prr', 'rappor')
     csv_out.writerow(header)
 
     # Construct an encoder instance per cohort.
@@ -209,12 +209,13 @@ def main(argv):
       e = encoders[cohort]
       # Real users should call e.encode().  For testing purposes, we also want
       # the PRR.
-      prr, irr = e._internal_encode(true_value)
+      bloom, prr, irr = e._internal_encode(true_value)
 
+      bloom_str = bit_string(bloom, params.num_bloombits)
       prr_str = bit_string(prr, params.num_bloombits)
       irr_str = bit_string(irr, params.num_bloombits)
 
-      out_row = (client, cohort, prr_str, irr_str)
+      out_row = (client, cohort, bloom_str, prr_str, irr_str)
       csv_out.writerow(out_row)
 
 

@@ -23,30 +23,29 @@
 
 // Like atoi, but with basic (not exhaustive) error checking.
 bool StringToInt(const char* s, int* result) {
-  bool success = true;
+  bool ok = true;
   char* end;  // mutated by strtol
 
   *result = strtol(s, &end, 10);  // base 10
   // If strol didn't consume any characters, it failed.
   if (end == s) {
-    success = false;
+    ok = false;
   }
-  return success;
+  return ok;
 }
 
 // Assuming the client string is an integer like "42", return the cohort.
 int GetCohort(const std::string& client_str, int num_cohorts) {
   int client;
-  bool success = StringToInt(client_str.c_str(), &client);
-  if (!success) {
+  bool ok = StringToInt(client_str.c_str(), &client);
+  if (!ok) {
     return -1;  // error signaled by invalid cohort
   }
   return client % num_cohorts;
 }
 
-
+// Copy a report into a string, which can go in a protobuf.
 void BitsToString(rappor::Bits b, std::string* output, int num_bytes) {
-  // Copy IRR into a string, which can go in a protobuf.
   output->assign(num_bytes, '\0');
   for (int i = 0; i < num_bytes; ++i) {
     // "little endian" string
@@ -55,8 +54,8 @@ void BitsToString(rappor::Bits b, std::string* output, int num_bytes) {
   }
 }
 
+// Print a report, with the most significant bit first.
 void PrintBitString(const std::string& s) {
-  // print significant bit first
   for (int i = s.size() - 1; i >= 0; --i) {
     unsigned char byte = s[i];
     for (int j = 7; j >= 0; --j) {

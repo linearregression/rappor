@@ -74,12 +74,10 @@ class RapporParamsTest(unittest.TestCase):
     num_words = params.num_bloombits // 32 + 1
     rand = MockRandom()
     rand_funcs = rappor.SimpleRandFuncs(params, rand)
-    rand_funcs.cohort_rand_fn = (lambda a, b: a)
 
-    assigned_cohort, f_bits, mask_indices = rappor.get_rappor_masks(
-        0, ["abc"], params, rand_funcs)
+    f_bits, mask_indices = rappor.get_rappor_masks(
+        'secret', 'abc', params, rand_funcs)
 
-    self.assertEquals(0, assigned_cohort)
     self.assertEquals(0x000db6d, f_bits)  # dependent on 3 MockRandom values
     self.assertEquals(0x0006db6, mask_indices)
 
@@ -95,7 +93,7 @@ class RapporParamsTest(unittest.TestCase):
   def testMakeBloomBits(self):
     for cohort in xrange(0, 64):
       b = rappor.make_bloom_bits('foo', cohort, 2, 16)
-      print 'cohort', cohort, 'bloom', b
+      #print 'cohort', cohort, 'bloom', b
 
   def testCohortToBytes(self):
     b = rappor.cohort_to_bytes(1)
@@ -117,35 +115,32 @@ class RapporParamsTest(unittest.TestCase):
     # First two calls to get_rappor_masks for identical inputs
     # Third call for a different input
     print '\tget_rappor_masks 1'
-    cohort_1, f_bits_1, mask_indices_1 = rappor.get_rappor_masks(
+    f_bits_1, mask_indices_1 = rappor.get_rappor_masks(
         "0", "abc", params, rand_funcs)
     print '\tget_rappor_masks 2'
-    cohort_2, f_bits_2, mask_indices_2 = rappor.get_rappor_masks(
+    f_bits_2, mask_indices_2 = rappor.get_rappor_masks(
         "0", "abc", params, rand_funcs)
     print '\tget_rappor_masks 3'
-    cohort_3, f_bits_3, mask_indices_3 = rappor.get_rappor_masks(
+    f_bits_3, mask_indices_3 = rappor.get_rappor_masks(
         "0", "abcd", params, rand_funcs)
 
     # First two outputs should be identical, i.e., identical PRRs
     self.assertEquals(f_bits_1, f_bits_2)
     self.assertEquals(mask_indices_1, mask_indices_2)
-    self.assertEquals(cohort_1, cohort_2)
 
     # Third PRR should be different from the first PRR
     self.assertNotEqual(f_bits_1, f_bits_3)
     self.assertNotEqual(mask_indices_1, mask_indices_3)
-    self.assertNotEqual(cohort_1, cohort_3)
 
     # Now testing with flag_oneprr false
     params.flag_oneprr = False
-    cohort_1, f_bits_1, mask_indices_1 = rappor.get_rappor_masks(
+    f_bits_1, mask_indices_1 = rappor.get_rappor_masks(
         "0", "abc", params, rand_funcs)
-    cohort_2, f_bits_2, mask_indices_2 = rappor.get_rappor_masks(
+    f_bits_2, mask_indices_2 = rappor.get_rappor_masks(
         "0", "abc", params, rand_funcs)
 
     self.assertNotEqual(f_bits_1, f_bits_2)
     self.assertNotEqual(mask_indices_1, mask_indices_2)
-    self.assertNotEqual(cohort_1, cohort_2)
 
   def testEncoder(self):
     """Expected bloom bits is computed as follows.
@@ -169,13 +164,11 @@ class RapporParamsTest(unittest.TestCase):
     params.prob_q = 0.75
 
     rand_funcs = rappor.SimpleRandFuncs(params, MockRandom())
-    rand_funcs.cohort_rand_fn = lambda a, b: a
-    e = rappor.Encoder(params, 0, rand_funcs=rand_funcs)
+    e = rappor.Encoder(params, 0, 'secret', rand_funcs=rand_funcs)
 
-    cohort, bloom_bits_irr = e.encode("abc")
+    irr = e.encode("abc")
 
-    self.assertEquals(0, cohort)
-    self.assertEquals(0x000ffff, bloom_bits_irr)
+    self.assertEquals(0x000ffff, irr)
 
 
 class MockRandom(object):

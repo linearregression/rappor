@@ -158,6 +158,7 @@ bool Encoder::Encode(const std::string& value, std::string* output) const {
   // Another thing we could do is use hmac(secret) ?
 
   char cohort[10];
+  // TODO: change to big endian
   sprintf(cohort, "%d", cohort_);
   std::string cohort_str(cohort);
   md5_func_(value + cohort_str, md5);

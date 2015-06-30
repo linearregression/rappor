@@ -191,7 +191,7 @@ def get_rappor_masks(secret, word, params, rand_funcs):
   """
   if params.flag_oneprr:
     stored_state = rand_funcs.rand.getstate()  # Store state
-    rand_funcs.rand.seed(user_id + word)  # Consistently seeded
+    rand_funcs.rand.seed(secret + word)  # Consistently seeded
 
   uniform = rand_funcs.uniform_gen()
   # fastrand generate numbers up to 64 bits, and returns None if more are
@@ -259,14 +259,11 @@ class Encoder(object):
     self.p_gen = self.rand_funcs.p_gen
     self.q_gen = self.rand_funcs.q_gen
 
-  def encode(self, word):
-    """Encode a string with RAPPOR.
+  def _internal_encode(self, word):
+    """Helper function for simulation / testing.
     
-    Args:
-      word: the string that should be privately transmitted.
-
     Returns:
-      A number that is the IRR (Instantaneous Randomized Response).
+      The PRR and the IRR.  The PRR should never be sent over the network.
     """
     params = self.params
 
@@ -304,4 +301,17 @@ class Encoder(object):
 
     irr = (p_bits & ~prr) | (q_bits & prr)
 
-    return irr  # IRR is the rappor
+    return prr, irr  # IRR is the rappor
+
+  def encode(self, word):
+    """Encode a string with RAPPOR.
+    
+    Args:
+      word: the string that should be privately transmitted.
+
+    Returns:
+      A number that is the IRR (Instantaneous Randomized Response).
+    """
+    _, irr = self._internal_encode(word)
+    return irr
+

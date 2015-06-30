@@ -15,7 +15,7 @@ readonly DIST=exp_cpp
 gen-params() {
   cat >$RAPPOR_SRC/_tmp/${DIST}_params.csv <<EOF
 k,h,m,p,q,f
-16,2,64,0.5,0.75,0.5
+8,2,128,0.25,0.75,0.5
 EOF
 }
 
@@ -64,9 +64,32 @@ rappor-sim() {
   make _tmp/rappor_test
   cd $RAPPOR_SRC
 
+  local out=_tmp/exp_cpp_out.csv
   time cat _tmp/exp_cpp_reports.csv \
     | client/proto/_tmp/rappor_test $num_cohorts 2>/dev/null \
-    > _tmp/exp_cpp_out.csv
+    > $out
+  head $out
+}
+
+rappor-sim-golden() {
+  cd $RAPPOR_SRC
+  export PYTHONPATH=$RAPPOR_SRC/client/python
+
+  local out=_tmp/rappor-sim-golden
+  mkdir -p $out
+
+  tests/rappor_sim.py \
+    --num-bits 8 \
+    --num-hashes 2 \
+    --num-cohorts 128 \
+    -p 0.25 \
+    -q 0.75 \
+    -p 0.5 \
+    -i _tmp/exp_cpp_reports.csv \
+    --out-prefix $out/exp_cpp
+
+  ls -al $out
+  head $out/exp_cpp_out.csv
 }
 
 sum-bits() {

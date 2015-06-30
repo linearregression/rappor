@@ -59,7 +59,7 @@ make-map() {
 }
 
 rappor-sim() {
-  local num_cohorts=64  # matches params
+  local num_cohorts=128  # matches params
 
   make _tmp/rappor_test
   cd $RAPPOR_SRC

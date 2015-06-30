@@ -44,7 +44,18 @@ int GetCohort(const std::string& client_str, int num_cohorts) {
   return client % num_cohorts;
 }
 
-// TODO: Params as flags?
+void PrintBitString(const std::string& s) {
+  // print significant bit first
+  for (int i = s.size() - 1; i >= 0; --i) {
+    unsigned char byte = s[i];
+    for (int j = 7; j >= 0; --j) {
+      bool bit = byte & (1 << j);
+      std::cout << (bit ? "1" : "0");
+    }
+  }
+}
+
+// TODO: Params as flags?  rappor_sim.py does this.  Or read CSV / JSON file.
 
 int main(int argc, char** argv) {
   if (argc != 2) {
@@ -72,14 +83,14 @@ int main(int argc, char** argv) {
 
   rappor::ReportList reports;
 
-  int num_bits = 16;
+  int num_bits = 8;
   int num_hashes = 2;
   rappor::Params params;
   params.set_num_bits(num_bits);
   params.set_num_hashes(num_hashes);
 
   rappor::LibcRandGlobalInit();  // seed
-  rappor::LibcRand libc_rand(params.num_bits(), 0.50 /*p*/, 0.75 /*q*/);
+  rappor::LibcRand libc_rand(params.num_bits(), 0.25 /*p*/, 0.75 /*q*/);
 
   // NOTE: If const char*, it crashes, I guess because of temporary.
   // std::string constructor is not EXPLICIT -- gah.
@@ -132,12 +143,12 @@ int main(int argc, char** argv) {
       break;
     }
 
-    rappor::log("CLIENT %s VALUE %s COHORT %d", client_str.c_str(), value.c_str(), cohort);
+    rappor::log("CLIENT %s VALUE %s COHORT %d", client_str.c_str(),
+        value.c_str(), cohort);
 
-    // TODO: split the line.  It looks like "client,string"
-
-    std::string out;
-    bool ok = encoders[i]->Encode(line, &out);
+    // TODO: This should be uint64.
+    std::string irr;
+    bool ok = encoders[i]->Encode(line, &irr);
     rappor::log("encoded %s", line.c_str());
 
     // NOTE: Are there really encoding errors?
@@ -145,21 +156,15 @@ int main(int argc, char** argv) {
       rappor::log("Error encoding string %s", line.c_str());
       break;
     }
-    reports.add_report(out);
+    reports.add_report(irr);
 
     std::cout << client_str;
     std::cout << ',';
     std::cout << cohort;
     std::cout << ',';
 
-    // print significant bit first
-    for (int i = out.size() - 1; i >= 0; --i) {
-      unsigned char byte = out[i];
-      for (int j = 7; j >= 0; --j) {
-        bool bit = byte & (1 << j);
-        std::cout << (bit ? "1" : "0");
-      }
-    }
+    PrintBitString(irr);
+
     std::cout << "\n";
   }
 

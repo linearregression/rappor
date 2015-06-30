@@ -261,7 +261,7 @@ class Encoder(object):
 
   def _internal_encode(self, word):
     """Helper function for simulation / testing.
-    
+
     Returns:
       The PRR and the IRR.  The PRR should never be sent over the network.
     """
@@ -305,7 +305,7 @@ class Encoder(object):
 
   def encode(self, word):
     """Encode a string with RAPPOR.
-    
+
     Args:
       word: the string that should be privately transmitted.
 
@@ -314,4 +314,3 @@ class Encoder(object):
     """
     _, irr = self._internal_encode(word)
     return irr
-

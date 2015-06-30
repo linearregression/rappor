@@ -224,7 +224,7 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
   // first term: 1 with (1/2 + f/2) probability
   // second term: 0 with 1/2 probability, B with 1/2 probability
   // NOTE: bloom is already 8 bits, while the others are 64 bits.
-  uint64_t prr = (f_bits & uniform) | (bloom & ~uniform);
+  uint64_t prr = (uniform & f_bits) | (bloom & ~f_bits);
   *prr_out = prr;
   log("prr: %08x", prr & debug_mask_);
 

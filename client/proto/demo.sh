@@ -23,7 +23,7 @@ EOF
 
 # We will have 64 cohorts
 gen-reports() {
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
 
   #../../tests/gen_sim_input.py -h
   local num_unique_values=100
@@ -31,11 +31,13 @@ gen-reports() {
   local values_per_client=10
   tests/gen_reports.R exp $num_unique_values $num_clients $values_per_client \
     _tmp/exp_cpp_reports.csv
+  popd
 }
 
 print-true-inputs() {
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   ./regtest.sh print-true-inputs 100 > _tmp/exp_cpp_true_inputs.txt
+  popd
 }
 
 # Print candidates from true inpputs
@@ -49,20 +51,21 @@ make-candidates() {
 make-map() {
   local dist=$DIST
 
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   export PYTHONPATH=$RAPPOR_SRC/client/python
 
   analysis/tools/hash_candidates.py \
     _tmp/${dist}_params.csv \
     < _tmp/${dist}_candidates.txt \
     > _tmp/${dist}_map.csv
+  popd
 }
 
 rappor-sim() {
   local num_cohorts=128  # matches params
 
   make _tmp/rappor_test
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
 
   local out=_tmp/exp_cpp_out.csv
   #time head -n 30 _tmp/exp_cpp_reports.csv \
@@ -71,10 +74,11 @@ rappor-sim() {
     > $out \
     2>/dev/null
   head -n 30 $out
+  popd
 }
 
 rappor-sim-golden() {
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   export PYTHONPATH=$RAPPOR_SRC/client/python
 
   local out=_tmp/rappor-sim-golden
@@ -92,15 +96,17 @@ rappor-sim-golden() {
 
   ls -al $out
   head -n 30 $out/exp_cpp_out.csv
+  popd
 }
 
 sum-bits() {
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   export PYTHONPATH=$RAPPOR_SRC/client/python
   analysis/tools/sum_bits.py \
     _tmp/${DIST}_params.csv \
     < _tmp/${DIST}_out.csv \
     > _tmp/${DIST}_counts.csv
+  popd
 }
 
 # This part is like rappor_sim.py, but in C++.
@@ -111,7 +117,7 @@ sum-bits() {
 
 encode-cohort() {
   make _tmp/rappor_test
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
 
   local cohort=$1
 
@@ -126,7 +132,7 @@ encode-cohort() {
 
 encode-demo() {
   make _tmp/rappor_test
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   local out=_tmp/encode_demo.txt
   local num_cohorts=4  # matches params
   time head -n 100 _tmp/exp_cpp_reports.csv \
@@ -171,7 +177,7 @@ with open(sys.argv[2], "w") as out_file:
 }
 
 compare-dist() {
-  cd $RAPPOR_SRC
+  pushd $RAPPOR_SRC
   local dist=exp_cpp  # fake one
 
   local case_dir=_tmp
@@ -190,6 +196,20 @@ compare-dist() {
     $case_dir/$dist \
     $instance_dir/$dist \
     $out_dir
+  popd
 }
+
+cpp() {
+  gen-params
+  gen-reports
+  print-true-inputs
+  make-candidates
+  make-map
+  rappor-sim
+  sum-bits
+  histogram
+  compare-dist
+}
+
 
 "$@"

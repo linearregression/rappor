@@ -54,6 +54,12 @@ run() {
   ./regtest.sh run-seq '^demo' 1 F
 }
 
+# Quick test.
+run-demo1() {
+  # Run all the test cases that start with "demo".
+  ./regtest.sh run-seq '^demo1' 1 F
+}
+
 # TODO: Port these old bad cases to regtest_spec.py.
 
 # Running the demo of the exponential distribution with 10000 reports (x7,

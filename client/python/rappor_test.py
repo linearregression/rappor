@@ -86,6 +86,13 @@ class RapporParamsTest(unittest.TestCase):
       b = rappor.get_bloom_bits('foo', cohort, 2, 16)
       print 'cohort', cohort, 'bloom', b
 
+  def testGetPrr(self):
+    bloom = 1
+    num_bits = 8
+    for word in ('v1', 'v2', 'v3'):
+      prr = rappor.get_prr(bloom, num_bits, word, 'secret', 0.5)
+      print 'PRR', prr, rappor.bit_string(prr, num_bits)
+
   def testCohortToBytes(self):
     b = rappor.cohort_to_bytes(1)
     print repr(b)

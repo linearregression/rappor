@@ -244,6 +244,52 @@ def get_bloom_bits(word, cohort, num_hashes, num_bloombits):
   return [ord(digest[i]) % num_bloombits for i in xrange(num_hashes)]
 
 
+def get_prr(bloom, num_bits, secret, word, prob_f):
+  h = hmac.new(secret, word, digestmod=hashlib.sha256)
+  log('HMAC-SHA256 %s', h.hexdigest())
+
+  # Now go through each byte
+  digest_bytes = h.digest()
+  assert len(digest_bytes) == 32
+
+  # Use 32 bits.  If we want 64 bits, it may be fine to generate another 32
+  # bytes by repeated HMAC.  For arbitrary numbers of bytes it's probably
+  # better to use the HMAC-DRBG algorithm.
+  if num_bits > len(digest_bytes):
+    raise RuntimeError('%d bits is more than the max of %d', num_bits, len(d))
+
+  threshold128 = prob_f * 128
+
+  uniform = 0
+  f_mask = 0
+
+  # Call bit i of the Bloom Filter B_i.  Then bit i of the PRR is defined as:
+  #
+  # 1   with prob f/2
+  # 0   with prob f/2
+  # B_i with prob 1-f
+
+  # uniform bits are 1 with probability 1/2, and f_mask bits are 1 with
+  # probability f.  So in the expression below:
+  #
+  # - Bits in (uniform & f_mask) are 1 with probability f/2.
+  # - (bloom_bits & ~f_mask) clears a bloom filter bit with probability
+  # f, so we get B_i with probability 1-f.
+  # - The remaining bits are 0, with remaining probability f/2.
+
+  for i, ch in enumerate(digest_bytes):
+    byte = ord(ch)
+
+    u = byte & 0x01  # extract rightmost bit
+    uniform |= (u << i);
+
+    rand128 = byte >> 1  # integer from [0, 128)
+    noise_bit = (rand128 < threshold128)
+    f_mask |= (noise_bit << i)
+
+  return (bloom & ~f_mask) | (uniform & f_mask) 
+
+
 def bit_string(irr, num_bloombits):
   """Like bin(), but uses leading zeroes, and no '0b'."""
   s = ''
@@ -254,6 +300,7 @@ def bit_string(irr, num_bloombits):
     else:
       bits.append('0')
   return ''.join(reversed(bits))
+
 
 
 class Encoder(object):
@@ -299,21 +346,10 @@ class Encoder(object):
     # To set c = a if m = 0 or b if m = 1
     # c = (a & not m) | (b & m)
 
-    # Call bit i of the Bloom Filter B_i.  Then bit i of the PRR is defined as:
-    #
-    # 1   with prob f/2
-    # 0   with prob f/2
-    # B_i with prob 1-f
+    prr = get_prr(bloom, num_bits, self.secret, word, self.params.prob_f)
 
-    # uniform bits are 1 with probability 1/2, and f_mask bits are 1 with
-    # probability f.  So in the expression below:
-    #
-    # - Bits in (uniform & f_mask) are 1 with probability f/2.
-    # - (bloom_bits & ~f_mask) clears a bloom filter bit with probability
-    # f, so we get B_i with probability 1-f.
-    # - The remaining bits are 0, with remaining probability f/2.
+    #prr = (uniform & f_mask) | (bloom & ~f_mask)
 
-    prr = (uniform & f_mask) | (bloom & ~f_mask)
     #log('U %s / F %s', bit_string(uniform, num_bits),
     #    bit_string(f_mask, num_bits))
 

@@ -346,9 +346,9 @@ class Encoder(object):
     # To set c = a if m = 0 or b if m = 1
     # c = (a & not m) | (b & m)
 
-    prr = get_prr(bloom, num_bits, self.secret, word, self.params.prob_f)
+    #prr = get_prr(bloom, num_bits, self.secret, word, self.params.prob_f)
 
-    #prr = (uniform & f_mask) | (bloom & ~f_mask)
+    prr = (uniform & f_mask) | (bloom & ~f_mask)
 
     #log('U %s / F %s', bit_string(uniform, num_bits),
     #    bit_string(f_mask, num_bits))

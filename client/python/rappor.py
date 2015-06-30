@@ -182,6 +182,21 @@ class SimpleRandFuncs(_RandFuncs):
 # p_gen
 
 
+def get_bf_bit_old(word, cohort, hash_num, num_bloombits):
+  """Returns the bit to set in the Bloom filter."""
+  h = '%s%s%s' % (cohort, hash_num, word)
+  sha1 = hashlib.sha1(h).digest()
+  # Use last two bytes as the hash.  We to allow want more than 2^8 = 256 bits,
+  # but 2^16 = 65536 is more than enough.  Default is 16 bits.
+  a, b = sha1[0], sha1[1]
+  return (ord(a) + ord(b) * 256) % num_bloombits
+
+
+def get_bloom_bits_old(word, cohort, num_hashes, num_bloombits):
+  return [get_bf_bit_old(word, cohort, i, num_bloombits)
+          for i in xrange(num_hashes)]
+
+
 def get_rappor_masks(secret, word, params, rand_funcs):
   """Call 3 random functions.  Seed deterministically beforehand if oneprr.
 
@@ -302,7 +317,6 @@ def bit_string(irr, num_bloombits):
   return ''.join(reversed(bits))
 
 
-
 class Encoder(object):
   """Obfuscates values for a given user using the RAPPOR privacy algorithm."""
 
@@ -332,8 +346,8 @@ class Encoder(object):
     params = self.params
     num_bits = params.num_bloombits
 
-    bloom_bits = get_bloom_bits(word, self.cohort, params.num_hashes,
-                                num_bits)
+    bloom_bits = get_bloom_bits_old(word, self.cohort, params.num_hashes,
+                                    num_bits)
 
     bloom = 0
     for bit_to_set in bloom_bits:

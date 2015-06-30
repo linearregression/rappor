@@ -86,6 +86,11 @@ class RapporParamsTest(unittest.TestCase):
       b = rappor.get_bloom_bits('foo', cohort, 2, 16)
       print 'cohort', cohort, 'bloom', b
 
+  def testGetBloomBitsOld(self):
+    for cohort in xrange(0, 64):
+      b = rappor.get_bloom_bits_old('foo', cohort, 2, 16)
+      print 'cohort', cohort, 'bloom', b
+
   def testGetPrr(self):
     bloom = 1
     num_bits = 8

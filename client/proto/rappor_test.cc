@@ -87,11 +87,11 @@ int main(int argc, char** argv) {
     exit(1);
   }
   if (!ok2) {
-    rappor::log("Invalid number of bits: '%s'", argv[2]);
+    rappor::log("Invalid number of hashes: '%s'", argv[2]);
     exit(1);
   }
   if (!ok3) {
-    rappor::log("Invalid number of bits: '%s'", argv[3]);
+    rappor::log("Invalid number of cohorts: '%s'", argv[3]);
     exit(1);
   }
 

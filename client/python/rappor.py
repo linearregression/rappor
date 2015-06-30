@@ -144,7 +144,6 @@ class _RandFuncs(object):
     """
     self.rand = rand or random.Random()
     self.num_bits = params.num_bloombits
-    self.cohort_rand_fn = self.rand.randint
 
 
 class SimpleRandFuncs(_RandFuncs):
@@ -152,13 +151,31 @@ class SimpleRandFuncs(_RandFuncs):
   def __init__(self, params, rand=None):
     _RandFuncs.__init__(self, params, rand=rand)
 
+    # PRR probability
     self.f_gen = SimpleRandom(params.prob_f, self.num_bits, rand=rand)
+
+    # IRR probabilities
     self.p_gen = SimpleRandom(params.prob_p, self.num_bits, rand=rand)
     self.q_gen = SimpleRandom(params.prob_q, self.num_bits, rand=rand)
     self.uniform_gen = SimpleRandom(0.5, self.num_bits, rand=rand)
 
 
-def get_rappor_masks(user_id, word, params, rand_funcs):
+# TODO:
+#
+# - IRR should be based on a client_secret
+#   - use hmac
+#
+# fastrand: Don't need it anymore?
+#
+# TODO: we approximate the 'f' PRR probability with multiple bits of
+# hmac-sha256.
+#
+# PRR uses hmac-sha256
+# IRR uses fastrand/etc.
+# p_gen
+
+
+def get_rappor_masks(secret, word, params, rand_funcs):
   """Call 3 random functions.  Seed deterministically beforehand if oneprr.
 
   TODO:
@@ -222,14 +239,6 @@ def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
   return bloom_bits
 
 
-# TODO:
-#
-# - Cohort should be passed in; Should return IRR only
-# - IRR should be based on a client_secret
-#   - use hmac
-# - hash function should be md5
-
-
 class Encoder(object):
   """Obfuscates values for a given user using the RAPPOR privacy algorithm."""
 
@@ -251,14 +260,21 @@ class Encoder(object):
     self.q_gen = self.rand_funcs.q_gen
 
   def encode(self, word):
-    """Compute rappor (Instantaneous Randomized Response)."""
-    params = self.params
+    """Encode a string with RAPPOR.
+    
+    Args:
+      word: the string that should be privately transmitted.
 
-    uniform, f_mask = get_rappor_masks(self.secret, word, params,
-                                       self.rand_funcs)
+    Returns:
+      A number that is the IRR (Instantaneous Randomized Response).
+    """
+    params = self.params
 
     bloom_bits = make_bloom_bits(word, self.cohort, params.num_hashes,
                                  params.num_bloombits)
+
+    uniform, f_mask = get_rappor_masks(self.secret, word, params,
+                                       self.rand_funcs)
 
     # Both bit manipulations below use the following fact:
     # To set c = a if m = 0 or b if m = 1
@@ -288,4 +304,4 @@ class Encoder(object):
 
     irr = (p_bits & ~prr) | (q_bits & prr)
 
-    return irr  # irr is the rappor
+    return irr  # IRR is the rappor

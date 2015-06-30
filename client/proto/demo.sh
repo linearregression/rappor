@@ -11,11 +11,18 @@ readonly RAPPOR_SRC=$(cd ../.. && pwd)
 
 readonly DIST=exp_cpp
 
+readonly num_bits=8
+readonly num_hashes=2
+readonly num_cohorts=128
+readonly p=0.25
+readonly q=0.75
+readonly f=0.5
+
 # Params from rappor_test
 gen-params() {
   cat >$RAPPOR_SRC/_tmp/${DIST}_params.csv <<EOF
 k,h,m,p,q,f
-8,2,128,0.25,0.75,0.5
+$num_bits,$num_hashes,$num_cohorts,$p,$q,$f
 EOF
 }
 
@@ -62,17 +69,16 @@ make-map() {
 }
 
 rappor-sim() {
-  local num_cohorts=128  # matches params
-
   make _tmp/rappor_test
   pushd $RAPPOR_SRC
 
   local out=_tmp/exp_cpp_out.csv
   #time head -n 30 _tmp/exp_cpp_reports.csv \
   time cat _tmp/exp_cpp_reports.csv \
-    | client/proto/_tmp/rappor_test $num_cohorts \
+    | client/proto/_tmp/rappor_test \
+      $num_bits $num_hashes $num_cohorts \
     > $out \
-    2>/dev/null
+    2>_tmp/rappor_test.log
   head -n 30 $out
   popd
 }

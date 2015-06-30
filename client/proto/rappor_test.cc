@@ -69,35 +69,39 @@ void PrintBitString(const std::string& s) {
 // TODO: Params as flags?  rappor_sim.py does this.  Or read CSV / JSON file.
 
 int main(int argc, char** argv) {
-  if (argc != 2) {
-    rappor::log("Usage: rappor_encode <cohort>");
+  if (argc != 4) {
+    rappor::log("Usage: rappor_encode <num bits> <num hashes> <num cohorts>");
     exit(1);
   }
-  // TODO: num_cohorts.  Then client name is hashed?
 
+  int num_bits;
+  int num_hashes;
   int num_cohorts;
-  bool success = StringToInt(argv[1], &num_cohorts);
-  rappor::log("OK %d", success);
-  if (!success) {
-    rappor::log("Invalid number of cohorts: '%s'", argv[1]);
-    exit(1);
-  }
-  rappor::log("cohorts %d", num_cohorts);
 
-  // atoi is lame, can't distinguish 0 from error!
-  /*
-  if (cohort == 0) {
-    rappor::log("Cohort must be an integer greater than 0.");
+  bool ok1 = StringToInt(argv[1], &num_bits);
+  bool ok2 = StringToInt(argv[2], &num_hashes);
+  bool ok3 = StringToInt(argv[3], &num_cohorts);
+
+  if (!ok1) {
+    rappor::log("Invalid number of bits: '%s'", argv[1]);
     exit(1);
   }
-  */
+  if (!ok2) {
+    rappor::log("Invalid number of bits: '%s'", argv[2]);
+    exit(1);
+  }
+  if (!ok3) {
+    rappor::log("Invalid number of bits: '%s'", argv[3]);
+    exit(1);
+  }
+
+  rappor::log("bits %d / hashes %d / cohorts %d", num_bits, num_hashes,
+      num_cohorts);
 
   rappor::ReportList reports;
 
-  int num_bits = 8;
   int num_bytes = num_bits / 8;
 
-  int num_hashes = 2;
   rappor::Params params;
   params.set_num_bits(num_bits);
   params.set_num_hashes(num_hashes);

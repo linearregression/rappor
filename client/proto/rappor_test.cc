@@ -162,7 +162,7 @@ int main(int argc, char** argv) {
     rappor::Bits bloom;
     rappor::Bits prr;
     rappor::Bits irr;
-    bool ok = encoders[cohort]->Encode(line, &bloom, &prr, &irr);
+    bool ok = encoders[cohort]->Encode(value, &bloom, &prr, &irr);
 
     // NOTE: Are there really encoding errors?
     if (!ok) {

@@ -133,7 +133,7 @@ void PrintSha256(Sha256Digest h) {
 bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
     Bits* irr_out) const {
 
-  rappor::log("Encode");
+  rappor::log("Encode '%s'", value.c_str());
 
   Bits bloom = 0;
 

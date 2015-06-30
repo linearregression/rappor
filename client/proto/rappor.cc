@@ -154,12 +154,12 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
   std::string hash_input(4 + value.size(), '\0');
 
   // Assuming less than 256 cohorts, the big endian representation is like 
-  // [<cohort> 0 0 0]
+  // [0 0 0 <cohort>]
   unsigned char c = cohort_ && 0xFF;
-  hash_input[0] = c;
+  hash_input[0] = '\0';
   hash_input[1] = '\0';
   hash_input[2] = '\0';
-  hash_input[3] = '\0';
+  hash_input[3] = c;
 
   // Copy the rest
   for (int i = 0; i < value.size(); ++i) {

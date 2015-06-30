@@ -166,7 +166,10 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
     hash_input[i + 4] = value[i];
   }
 
+  log("COHORT: %d", cohort_);
+
   md5_func_(hash_input, md5);
+  log("MD5:");
   PrintMd5(md5);
 
   // We don't need the full precision
@@ -189,7 +192,7 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
   Sha256Digest sha256;
   hmac_func_(client_secret_, value, sha256);
 
-  log("sha256:\n");
+  log("SHA256:");
   PrintSha256(sha256);
 
   // NOTE: This could be 1 to 7 byte strides out of 32 bytes to enable more
@@ -215,8 +218,8 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
   }
 
   // NOTE: Could change format string
-  log("f_bits: %08x", f_bits & debug_mask_);
-  log("uniform: %08x", uniform & debug_mask_);
+  //log("f_bits: %08x", f_bits & debug_mask_);
+  //log("uniform: %08x", uniform & debug_mask_);
   
   // first term: 1 with (1/2 + f/2) probability
   // second term: 0 with 1/2 probability, B with 1/2 probability

@@ -119,18 +119,6 @@ def print_histogram(word_hist, histfile):
     print >>histfile, fmt % pair
 
 
-def bit_string(irr, num_bloombits):
-  """Like bin(), but uses leading zeroes, and no '0b'."""
-  s = ''
-  bits = []
-  for bit_num in xrange(num_bloombits):
-    if irr & (1 << bit_num):
-      bits.append('1')
-    else:
-      bits.append('0')
-  return ''.join(reversed(bits))
-
-
 def main(argv):
   (opts, argv) = CreateOptionsParser().parse_args(argv)
   if not opts.infile:
@@ -199,6 +187,10 @@ def main(argv):
     start_time = time.time()
 
     for i, (client_str, true_value) in enumerate(csv_in):
+
+      #if i == 20:  # EARLY STOP
+      #  break
+
       if i % 10000 == 0:
         elapsed = time.time() - start_time
         log('Processed %d inputs in %.2f seconds', i, elapsed)
@@ -211,9 +203,9 @@ def main(argv):
       # the PRR.
       bloom, prr, irr = e._internal_encode(true_value)
 
-      bloom_str = bit_string(bloom, params.num_bloombits)
-      prr_str = bit_string(prr, params.num_bloombits)
-      irr_str = bit_string(irr, params.num_bloombits)
+      bloom_str = rappor.bit_string(bloom, params.num_bloombits)
+      prr_str = rappor.bit_string(prr, params.num_bloombits)
+      irr_str = rappor.bit_string(irr, params.num_bloombits)
 
       out_row = (client, cohort, bloom_str, prr_str, irr_str)
       csv_out.writerow(out_row)

@@ -84,7 +84,7 @@ rappor-sim-golden() {
     --num-cohorts 128 \
     -p 0.25 \
     -q 0.75 \
-    -p 0.5 \
+    -f 0.5 \
     -i _tmp/exp_cpp_reports.csv \
     --out-prefix $out/exp_cpp
 

@@ -132,7 +132,7 @@ int main(int argc, char** argv) {
   std::string line;
 
   // CSV header
-  std::cout << "client,cohort,rappor\n";
+  std::cout << "client,cohort,bloom,prr,rappor\n";
 
   while (true) {
     std::getline(std::cin, line);  // no trailing newline

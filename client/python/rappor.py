@@ -25,10 +25,17 @@ import hmac
 import json
 import random
 import struct
+import sys
 
 
 class Error(Exception):
   pass
+
+
+def log(msg, *args):
+  if args:
+    msg = msg % args
+  print >>sys.stderr, msg
 
 
 class Params(object):
@@ -239,6 +246,18 @@ def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
   return bloom_bits
 
 
+def bit_string(irr, num_bloombits):
+  """Like bin(), but uses leading zeroes, and no '0b'."""
+  s = ''
+  bits = []
+  for bit_num in xrange(num_bloombits):
+    if irr & (1 << bit_num):
+      bits.append('1')
+    else:
+      bits.append('0')
+  return ''.join(reversed(bits))
+
+
 class Encoder(object):
   """Obfuscates values for a given user using the RAPPOR privacy algorithm."""
 
@@ -266,9 +285,10 @@ class Encoder(object):
       The PRR and the IRR.  The PRR should never be sent over the network.
     """
     params = self.params
+    num_bits = params.num_bloombits
 
     bloom_bits = make_bloom_bits(word, self.cohort, params.num_hashes,
-                                 params.num_bloombits)
+                                 num_bits)
 
     uniform, f_mask = get_rappor_masks(self.secret, word, params,
                                        self.rand_funcs)
@@ -292,6 +312,11 @@ class Encoder(object):
     # - The remaining bits are 0, with remaining probability f/2.
 
     prr = (uniform & f_mask) | (bloom_bits & ~f_mask)
+    #log('U %s / F %s', bit_string(uniform, num_bits),
+    #    bit_string(f_mask, num_bits))
+
+    #log('B %s / PRR %s', bit_string(bloom_bits, num_bits),
+    #    bit_string(prr, num_bits))
 
     # Compute instantaneous randomized response:
     # If PRR bit is set, output 1 with probability q

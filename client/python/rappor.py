@@ -220,13 +220,11 @@ def cohort_to_bytes(cohort):
   return struct.pack('>L', cohort)
 
 
-# TODO: move md5 out of here, so it's only calculated once.  Should return an
-# array of length "num_hashes".
+def get_bloom_bits(word, cohort, num_hashes, num_bloombits):
+  """Return an array of bits to set in the bloom filter.
 
-def which_bit(word, cohort, hash_num, num_bloombits):
-  """Returns the bit to set in the Bloom filter.
-
-  NOTE: This is called by hash_candidates.py to make the map file.
+  In the real report, we bitwise-OR them together.  In hash candidates, we put
+  them in separate entries in the "map" matrix.
   """
   value = cohort_to_bytes(cohort) + word  # Cohort is 4 byte prefix.
   md5 = hashlib.md5(value)
@@ -236,23 +234,14 @@ def which_bit(word, cohort, hash_num, num_bloombits):
   # Each has is a byte, which means we could have up to 256 bit Bloom filters.
   # There are 16 bytes in an MD5, in which case we can have up to 16 hash
   # functions per Bloom filter.
-  if hash_num > len(digest):
+  if num_hashes > len(digest):
     raise RuntimeError("Can't have more than %d hashes" % md5)
 
-  log('hash_input %r', value)
-  log('Cohort %d', cohort)
-  log('MD5 %s', md5.hexdigest())
+  #log('hash_input %r', value)
+  #log('Cohort %d', cohort)
+  #log('MD5 %s', md5.hexdigest())
 
-  return ord(digest[hash_num]) % num_bloombits
-
-
-def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
-  """Compute Bloom Filter."""
-  bloom_bits = 0
-  for hash_num in xrange(num_hashes):
-    bit_to_set = which_bit(word, cohort, hash_num, num_bloombits)
-    bloom_bits |= (1 << bit_to_set)
-  return bloom_bits
+  return [ord(digest[i]) % num_bloombits for i in xrange(num_hashes)]
 
 
 def bit_string(irr, num_bloombits):
@@ -296,8 +285,12 @@ class Encoder(object):
     params = self.params
     num_bits = params.num_bloombits
 
-    bloom_bits = make_bloom_bits(word, self.cohort, params.num_hashes,
-                                 num_bits)
+    bloom_bits = get_bloom_bits(word, self.cohort, params.num_hashes,
+                                num_bits)
+
+    bloom = 0
+    for bit_to_set in bloom_bits:
+      bloom |= (1 << bit_to_set)
 
     uniform, f_mask = get_rappor_masks(self.secret, word, params,
                                        self.rand_funcs)
@@ -320,7 +313,7 @@ class Encoder(object):
     # f, so we get B_i with probability 1-f.
     # - The remaining bits are 0, with remaining probability f/2.
 
-    prr = (uniform & f_mask) | (bloom_bits & ~f_mask)
+    prr = (uniform & f_mask) | (bloom & ~f_mask)
     #log('U %s / F %s', bit_string(uniform, num_bits),
     #    bit_string(f_mask, num_bits))
 
@@ -335,7 +328,7 @@ class Encoder(object):
 
     irr = (p_bits & ~prr) | (q_bits & prr)
 
-    return bloom_bits, prr, irr  # IRR is the rappor
+    return bloom, prr, irr  # IRR is the rappor
 
   def encode(self, word):
     """Encode a string with RAPPOR.

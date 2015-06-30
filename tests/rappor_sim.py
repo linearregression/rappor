@@ -188,8 +188,8 @@ def main(argv):
 
     for i, (client_str, true_value) in enumerate(csv_in):
 
-      if i == 30:  # EARLY STOP
-        break
+      #if i == 30:  # EARLY STOP
+      #  break
 
       if i % 10000 == 0:
         elapsed = time.time() - start_time

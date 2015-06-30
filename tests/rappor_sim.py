@@ -190,21 +190,24 @@ def main(argv):
     header = ('client', 'cohort', 'rappor')
     csv_out.writerow(header)
 
-    cur_client = None  # current client
+    # Construct an encoder instance per cohort.
+    encoders = [None] * params.num_cohorts
+    for i in xrange(params.num_cohorts):
+      encoders[i] = rappor.Encoder(
+          params, i, 'secret', rand_funcs=rand_funcs)
 
     start_time = time.time()
 
-    for i, (client, true_value) in enumerate(csv_in):
+    for i, (client_str, true_value) in enumerate(csv_in):
       if i % 10000 == 0:
         elapsed = time.time() - start_time
         log('Processed %d inputs in %.2f seconds', i, elapsed)
 
-      # New encoder instance for each client.
-      if client != cur_client:
-        cur_client = client
-        e = rappor.Encoder(params, cur_client, rand_funcs=rand_funcs)
+      client = int(client_str)
+      cohort = client % params.num_cohorts
 
-      cohort, irr = e.encode(true_value)
+      e = encoders[cohort]
+      irr = e.encode(true_value)
 
       # encoded is a list of (cohort, rappor) pairs
       out_row = (client, cohort, bit_string(irr, params.num_bloombits))

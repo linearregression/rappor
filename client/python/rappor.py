@@ -176,7 +176,6 @@ def get_rappor_masks(user_id, word, params, rand_funcs):
     stored_state = rand_funcs.rand.getstate()  # Store state
     rand_funcs.rand.seed(user_id + word)  # Consistently seeded
 
-  assigned_cohort = rand_funcs.cohort_rand_fn(0, params.num_cohorts - 1)
   uniform = rand_funcs.uniform_gen()
   # fastrand generate numbers up to 64 bits, and returns None if more are
   # requested.
@@ -187,7 +186,7 @@ def get_rappor_masks(user_id, word, params, rand_funcs):
   if params.flag_oneprr:                    # Restore state
     rand_funcs.rand.setstate(stored_state)
 
-  return assigned_cohort, uniform, f_mask
+  return uniform, f_mask
 
 
 def cohort_to_bytes(cohort):
@@ -234,16 +233,18 @@ def make_bloom_bits(word, cohort, num_hashes, num_bloombits):
 class Encoder(object):
   """Obfuscates values for a given user using the RAPPOR privacy algorithm."""
 
-  def __init__(self, params, user_id, rand_funcs=None):
+  def __init__(self, params, cohort, secret, rand_funcs=None):
     """
     Args:
       params: RAPPOR Params() controlling privacy
-      user_id: user ID, for generating cohort.  (In the simulator, each user
-        gets its own Encoder instance.)
+      cohort: cohort, for PRR.  In the simulator, each user
+        gets its own Encoder instance.
+      secret: For PRR to be a deterministic function of the reported value.
       rand_funcs: randomness, can be deterministic for testing.
     """
     self.params = params  # RAPPOR params
-    self.user_id = user_id
+    self.cohort = cohort
+    self.secret = secret
 
     self.rand_funcs = rand_funcs or SimpleRandFuncs(params)
     self.p_gen = self.rand_funcs.p_gen
@@ -253,11 +254,11 @@ class Encoder(object):
     """Compute rappor (Instantaneous Randomized Response)."""
     params = self.params
 
-    cohort, uniform, f_mask = get_rappor_masks(self.user_id, word,
-                                               params,
-                                               self.rand_funcs)
+    uniform, f_mask = get_rappor_masks(self.secret, word, params,
+                                       self.rand_funcs)
 
-    bloom_bits = make_bloom_bits(word, cohort, params.num_hashes, params.num_bloombits)
+    bloom_bits = make_bloom_bits(word, self.cohort, params.num_hashes,
+                                 params.num_bloombits)
 
     # Both bit manipulations below use the following fact:
     # To set c = a if m = 0 or b if m = 1
@@ -287,4 +288,4 @@ class Encoder(object):
 
     irr = (p_bits & ~prr) | (q_bits & prr)
 
-    return cohort, irr  # irr is the rappor
+    return irr  # irr is the rappor

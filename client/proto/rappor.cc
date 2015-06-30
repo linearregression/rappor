@@ -150,11 +150,23 @@ bool Encoder::Encode(const std::string& value, Bits* bloom_out, Bits* prr_out,
   //
   // Another thing we could do is use hmac(secret) ?
 
-  char cohort[10];
-  // TODO: change to big endian
-  sprintf(cohort, "%d", cohort_);
-  std::string cohort_str(cohort);
-  md5_func_(value + cohort_str, md5);
+  // 4 byte cohort + actual value
+  std::string hash_input(4 + value.size(), '\0');
+
+  // Assuming less than 256 cohorts, the big endian representation is like 
+  // [<cohort> 0 0 0]
+  unsigned char c = cohort_ && 0xFF;
+  hash_input[0] = c;
+  hash_input[1] = '\0';
+  hash_input[2] = '\0';
+  hash_input[3] = '\0';
+
+  // Copy the rest
+  for (int i = 0; i < value.size(); ++i) {
+    hash_input[i + 4] = value[i];
+  }
+
+  md5_func_(hash_input, md5);
   PrintMd5(md5);
 
   // We don't need the full precision

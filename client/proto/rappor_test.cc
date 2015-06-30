@@ -49,7 +49,6 @@ void BitsToString(rappor::Bits b, std::string* output, int num_bytes) {
   // Copy IRR into a string, which can go in a protobuf.
   output->assign(num_bytes, '\0');
   for (int i = 0; i < num_bytes; ++i) {
-    rappor::log("i: %d", i);
     // "little endian" string
     (*output)[i] = b & 0xFF;  // last byte
     b >>= 8;
@@ -201,7 +200,7 @@ int main(int argc, char** argv) {
   header->set_cohort(cohort_tmp);
   header->mutable_params()->CopyFrom(params);
 
-  rappor::log("report list %s", reports.DebugString().c_str());
+  //rappor::log("report list %s", reports.DebugString().c_str());
 
   // Cleanup
   for (int i = 0; i < num_cohorts; ++i) {

@@ -65,9 +65,10 @@ rappor-sim() {
   cd $RAPPOR_SRC
 
   local out=_tmp/exp_cpp_out.csv
-  time cat _tmp/exp_cpp_reports.csv \
-    | client/proto/_tmp/rappor_test $num_cohorts 2>/dev/null \
+  time head -n 30 _tmp/exp_cpp_reports.csv \
+    | client/proto/_tmp/rappor_test $num_cohorts \
     > $out
+    #2>/dev/null \
   head -n 30 $out
 }
 

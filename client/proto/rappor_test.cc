@@ -113,8 +113,6 @@ int main(int argc, char** argv) {
   // std::string constructor is not EXPLICIT -- gah.
   std::string client_secret("secret");
 
-  int cohort_tmp = 3;  // TODO: replace
-
   const char* metric_name = "home-page";
 
   // Create an encoder for each cohort.
@@ -139,7 +137,7 @@ int main(int argc, char** argv) {
 
   while (true) {
     std::getline(std::cin, line);  // no trailing newline
-    rappor::log("Got line %s", line.c_str());
+    //rappor::log("Got line %s", line.c_str());
 
     if (line.empty()) {
       break;
@@ -201,7 +199,7 @@ int main(int argc, char** argv) {
   rappor::ReportListHeader* header = reports.mutable_header();
   // client params?
   header->set_metric_name(metric_name);
-  header->set_cohort(cohort_tmp);
+  header->set_cohort(99);  // TODO: Fix this
   header->mutable_params()->CopyFrom(params);
 
   //rappor::log("report list %s", reports.DebugString().c_str());
